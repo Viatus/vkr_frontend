@@ -1,72 +1,46 @@
 <template>
-  <div class="parent_container">
+  <div class="bar-container">
+    <div>
+      <label class="top-label"> Лучшие по жанрам(плэйсхолдер) </label>
+    </div>
+    <div>
+      <label class="tags-label"> Лучшие по тэгам(плэйсхолдер) </label>
+    </div>
     <form class="searchbar">
       <input
         type="text"
         placeholder="Интересное произведение"
         v-model="form.searchText"
         @input="searchTextChanged()"
-        @focus="setOptions()"
-        @blur="hideOptions()"
+        @focus="setSearchOptions(true)"
+        @blur="setSearchOptions(false)"
       />
-      <button>Поиск</button>
-      <div v-if="optionsShow" class="options-container">
-        <ul class="options-list">
+      <button type="button">Поиск</button>
+      <div v-if="searchOptionsShow" class="options-container">
+        <ul v-if="optionsCreations.length != 0" class="options-list">
           <li
             v-for="creation in optionsCreations"
             :key="creation.id"
             class="options-li"
+            @click="this.$router.go(`/creations/${creation.id}`)"
           >
             <img src="@/assets/logo.png" />
-            <h5>{{ creation.name }}</h5>
+            <label>{{ creation.name }}</label>
           </li>
         </ul>
+        <label v-if="optionsCreations.length == 0"> Ничего не найдено </label>
       </div>
     </form>
-    <div>
-      <div v-if="loading" class="loading">Loading...</div>
-
-      <div v-if="!loading">
-        <ul list-style="">
-          <li v-for="creation in creations" :key="creation.id">
-            <div class="list-item">
-              <h5 v-if="creation.CreationTypeId == 2" class="creation_type">
-                Книга
-              </h5>
-              <h5 v-if="creation.CreationTypeId == 3" class="creation_type">
-                Фильм
-              </h5>
-              <h5 v-if="creation.CreationTypeId == 4" class="creation_type">
-                Сериал
-              </h5>
-              <h4
-                v-if="approved"
-                class="creation_name"
-                @click="$router.push(`/creations/${creation.id}`)"
-              >
-                {{ creation.name }}
-              </h4>
-              <h4
-                v-if="!approved"
-                class="creation_name"
-                @click="$router.push(`/unapproved-creations/${creation.id}`)"
-              >
-                {{ creation.name }}
-              </h4>
-            </div>
-          </li>
-        </ul>
-
-        <button v-if="approved" @click="$router.push(`/add-creation`)">
-          Добавить произведение
-        </button>
-        <button @click="logout">Выйти</button>
-        <button v-if="isAdmin && approved" @click="fetchUnapprovedCreations">
-          Список ожидающих одобрения
-        </button>
-        <button v-if="isAdmin && !approved" @click="fetchCreations">
-          Список одобренных
-        </button>
+    <div class="profile-container">
+      <label
+        class="porfile-label"
+        @mouseenter="setProfileShown(true)"
+        @mouseleave="setProfileShown(false)"
+      >
+        {{ email }}</label
+      >
+      <div v-if="profileShown">
+        <label> А тут будет разное</label>
       </div>
     </div>
   </div>
@@ -78,20 +52,23 @@ export default {
   data() {
     return {
       loading: false,
-      creations: null,
-      optionsCreations: null,
+      optionsCreations: [],
       isAdmin: false,
-      approved: true,
       form: {
         searchText: "",
       },
-      optionsShow: false,
+      searchOptionsShow: false,
+      topOptions: false,
+      profileShown: false,
+      creationsTypes: [],
+      email: "",
     };
   },
   created() {
     if (localStorage.getItem("is_admin")) {
       this.isAdmin = true;
     }
+    this.email = localStorage.getItem("email");
     this.fetchCreations();
   },
   watch: {
@@ -115,26 +92,33 @@ export default {
           alert(`${error}`);
         });
     },
-    fetchUnapprovedCreations() {
-      this.loading = true;
+    fetchGenres() {
       const fetchedId = this.$route.params.id;
       axios
-        .get(`${APIURL}/creations-unapproved`)
+        .get(`${APIURL}/genres`)
         .then((result) => {
           if (this.$route.params.id !== fetchedId) return;
-          this.loading = false;
           if (result.data.result !== undefined) {
-            this.creations = result.data.result;
-            this.approved = false;
+            this.genres = result.data.result;
           }
         })
         .catch((error) => {
           alert(`${error}`);
         });
     },
-    logout() {
-      localStorage.setItem("token", "");
-      this.$router.push("/");
+    fetchTags() {
+      const fetchedId = this.$route.params.id;
+      axios
+        .get(`${APIURL}/tags`)
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          if (result.data.result !== undefined) {
+            this.tags = result.data.result;
+          }
+        })
+        .catch((error) => {
+          alert(`${error}`);
+        });
     },
     searchTextChanged() {
       if (this.form.searchText == "") {
@@ -156,27 +140,24 @@ export default {
           alert(`${error}`);
         });
     },
-    setOptions() {
-      this.optionsShow = true;
+    setSearchOptions(flag) {
+      this.searchOptionsShow = flag;
     },
-    hideOptions() {
-      this.optionsShow = false;
+    setTopOptions(flag) {
+      this.topOptionsShow = flag;
+    },
+    setProfileShown(flag) {
+      this.profileShown = flag;
     },
   },
 };
 </script>
 <style scoped>
-.list-item {
-  display: grid;
-}
-
-.creation_type {
-  opacity: 0.5;
-}
-
-.parent_container {
+.bar-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
 }
 
 .options-container {
@@ -196,4 +177,4 @@ export default {
   border-top: 1px solid gray;
   max-height: 60px;
 }
-</style>
+</style>>

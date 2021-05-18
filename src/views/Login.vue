@@ -53,6 +53,7 @@ export default {
           });
           localStorage.setItem("token", token);
           localStorage.setItem("is_admin", is_admin);
+          localStorage.setItem("email", email);
           this.$router.push("/main-list");
         } catch (error) {
           console.log(error);
