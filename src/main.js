@@ -7,6 +7,7 @@ import MainList from '@/views/MainList';
 import AddCreation from '@/views/AddCreation';
 import CreationPage from '@/views/CreationPage';
 import UnapprovedCreationPage from '@/views/UnapprovedCreationPage';
+import AdminPage from '@/views/AdminPage'
 /*import axios from 'axios';
 
 
@@ -38,7 +39,8 @@ const routes = [
   { path: '/main-list', component: MainList },
   { path: '/add-creation', beforeEnter, component: AddCreation},
   { path: '/creations/:id', component: CreationPage},
-  { path: '/unapproved-creations/:id', component: UnapprovedCreationPage}
+  { path: '/unapproved-creations/:id', component: UnapprovedCreationPage},
+  { path: '/admin-page', component: AdminPage}
 ];
 const router = createRouter({
   history: createWebHistory(),

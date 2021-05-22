@@ -31,16 +31,14 @@
         <label v-if="optionsCreations.length == 0"> Ничего не найдено </label>
       </div>
     </form>
-    <div class="profile-container">
-      <label
-        class="porfile-label"
-        @mouseenter="setProfileShown(true)"
-        @mouseleave="setProfileShown(false)"
-      >
-        {{ email }}</label
-      >
+    <div
+      class="profile-container"
+      @mouseenter="setProfileShown(true)"
+      @mouseleave="setProfileShown(false)"
+    >
+      <label class="porfile-label"> {{ email }}</label>
       <div v-if="profileShown">
-        <label> А тут будет разное</label>
+        <router-link to="/admin-page">Панель управления</router-link>
       </div>
     </div>
   </div>

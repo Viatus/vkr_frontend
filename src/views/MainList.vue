@@ -1,28 +1,6 @@
 <template>
   <div class="parent_container">
-    <form class="searchbar">
-      <input
-        type="text"
-        placeholder="Интересное произведение"
-        v-model="form.searchText"
-        @input="searchTextChanged()"
-        @focus="setOptions()"
-        @blur="hideOptions()"
-      />
-      <button>Поиск</button>
-      <div v-if="optionsShow" class="options-container">
-        <ul class="options-list">
-          <li
-            v-for="creation in optionsCreations"
-            :key="creation.id"
-            class="options-li"
-          >
-            <img src="@/assets/logo.png" />
-            <h5>{{ creation.name }}</h5>
-          </li>
-        </ul>
-      </div>
-    </form>
+    <custom-header />
     <div>
       <div v-if="loading" class="loading">Loading...</div>
 
@@ -74,7 +52,12 @@
 <script>
 import axios from "axios";
 import { APIURL } from "../constants";
+import CustomHeader from "../components/CustomHeader";
+
 export default {
+  components: {
+    "custom-header": CustomHeader,
+  },
   data() {
     return {
       loading: false,
