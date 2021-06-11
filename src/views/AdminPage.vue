@@ -53,6 +53,7 @@
         />
         <button type="button" @click="addRoleRequest()">Отправить</button>
       </div>
+      <router-link to="/main-list">Неодобренные произведения</router-link>
     </div>
   </div>
 </template>

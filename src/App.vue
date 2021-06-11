@@ -1,4 +1,5 @@
 <template>
+  <div id="modals"></div>
   <router-view></router-view>
 </template>
 <script>

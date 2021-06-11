@@ -18,6 +18,12 @@
               {{ genre.name }}
             </option>
           </select>
+          <div v-if="form.type == 'Книга'">
+            <input v-model="isbn" type="text" placeholder="ISBN" />
+            <button type="button" @click="fillFieldsByISBN()">
+              Заполнить по ISBN
+            </button>
+          </div>
           <input
             v-model="form.country"
             type="text"
@@ -64,6 +70,7 @@
                   {{ role.name }}
                 </option>
               </select>
+              <router-link to="/add-author" title="Добавить автора">+</router-link>
             </li>
           </ul>
           <button type="button" @click="setupNewAuthor()">
@@ -83,7 +90,6 @@
             id="file-input"
           />
           <button type="button" @click="sendCreation">Отправить</button>
-          <h1>Чуть позже появятся авторы</h1>
           <button type="button" @click="$router.push('/main-list')">
             Назад
           </button>
@@ -95,14 +101,14 @@
 <script>
 import axios from "axios";
 import FormData from "form-data";
-import { APIURL } from "../constants";
+import { APIURL, BOOKAPIURL } from "../constants";
 import Datepicker from "vue3-datepicker";
 import { ru } from "date-fns/locale";
 import CustomHeader from "../components/CustomHeader";
 
 export default {
   components: {
-    datepicker: Datepicker,
+    "datepicker": Datepicker,
     "custom-header": CustomHeader,
   },
   data() {
@@ -121,9 +127,10 @@ export default {
       authors: null,
       roles: null,
       checkedTags: [],
-      url: require("@/assets/logo.png"),
+      url: require("@/assets/placeholder.png"),
       locale: ru,
       image: null,
+      isbn: "",
     };
   },
   async created() {
@@ -255,8 +262,7 @@ export default {
                   },
                 }
               )
-              .then(() => {
-              })
+              .then(() => {})
               .catch((err) => {
                 alert(err.message);
               });
@@ -267,13 +273,31 @@ export default {
         });
     },
     previewImage(event) {
-      const file = event.target.files[0];
       this.image = event.target.files[0];
-      this.url = URL.createObjectURL(file);
+      this.url = URL.createObjectURL(this.image);
     },
     setupNewAuthor() {
       let newAuthor = new Object();
       this.form.choosenAuthors.push(newAuthor);
+    },
+    fillFieldsByISBN() {
+      axios
+        .get(BOOKAPIURL, {
+          params: {
+            q: "isbn+" + this.isbn,
+          },
+        })
+        .then((result) => {
+          this.form.country = result.data.items[0].volumeInfo.language; //??????
+          this.form.name = result.data.items[0].volumeInfo.title;
+          //this.form.date = result.data.items[0].volumeInfo.publishedDate;
+          this.form.description = result.data.items[0].volumeInfo.description;
+          this.form.ageRating = result.data.items[0].volumeInfo.maturityRating;
+          //Еще можно загрузить картинку из result.data.items[0].volumeInfo.imageLinks.thumbnail
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
     },
   },
 };

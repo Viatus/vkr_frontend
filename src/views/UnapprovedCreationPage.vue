@@ -1,12 +1,17 @@
 <template>
-  <div class="wrapper">
+  <div class="">
     <div>
-      <h1>{{ info.name }}</h1>
-      <h2>{{ info.creation_type }}</h2>
-      <h3>{{ info.date_published }}</h3>
-      <h3>{{ info.description }}</h3>
-      <h3>{{ info.country }}</h3>
-      <h3>{{ info.age_rating }}</h3>
+      <input type="text" readonly="true" v-model="info.name" />
+      <input type="text" readonly="true" v-model="info.creation_type" />
+      <!--ПОменять дату на дейтпикер-->
+      <input
+        type="text"
+        v-model="date_published"
+        placeholder="Дата публикации"
+      />
+      <input type="text" v-model="description" placeholder="Описание" />
+      <input type="text" v-model="country" placeholder="Страна" />
+      <input type="text" v-model="age_rating" placeholder="Возраст" />
     </div>
     <button @Click="approveCreation">Утвердить</button>
     <button @Click="deleteCreation">Удалить</button>
@@ -19,7 +24,18 @@ import { APIURL } from "../constants";
 export default {
   data() {
     return {
-      info: null,
+      info: {
+        name: "",
+        creation_type: "",
+        date_published: "",
+        description: "",
+        country: "",
+        age_rating: "",
+      },
+      description: "",
+      country: "",
+      age_rating: "",
+      date_published: "",
     };
   },
   async created() {
@@ -33,7 +49,33 @@ export default {
         .then((result) => {
           if (this.$route.params.id !== fetchedId) return;
           if (result.data.result !== undefined) {
-            this.info = result.data.result;
+            this.info.country = result.data.result.country
+              ? result.data.result.country
+              : "";
+            this.info.age_rating = result.data.result.age_rating
+              ? result.data.result.age_rating
+              : "";
+            this.info.description = result.data.result.description
+              ? result.data.result.description
+              : "";
+            this.info.date_published = result.data.result.date_published
+              ? result.data.result.date_published
+              : "";
+            this.info.name = result.data.result.Creation_Names[0].name
+              ? result.data.result.Creation_Names[0].name
+              : "";
+            this.description = this.info.description;
+            this.country = this.info.country;
+            this.age_rating = this.info.age_rating;
+            this.date_published = this.info.date_published;
+            axios
+              .get(`${APIURL}/genres/${result.data.result.CreationTypeId}`)
+              .then((resultGenre) => {
+                this.info.creation_type = resultGenre.data.result.name;
+              })
+              .catch((error) => {
+                alert(`${error}`);
+              });
           }
         })
         .catch((error) => {
@@ -42,12 +84,23 @@ export default {
     },
     approveCreation() {
       const token = localStorage.getItem("token");
+      let body = {};
+      if (this.country != this.info.country) {
+        body.country = this.country;
+      }
+      if (this.age_rating != this.info.age_rating) {
+        body.age_rating = this.age_rating;
+      }
+      if (this.description != this.info.description) {
+        body.description = this.description;
+      }
+      if (this.date_published != this.info.date_published) {
+        body.date_published = this.date_published;
+      }
       axios
-        .post(
-          `${APIURL}/creations_approve`,
-          {
-            new_record_id: this.$route.params.id,
-          },
+        .put(
+          `${APIURL}/creations-unapproved/${this.$route.params.id}`,
+          body,
           { headers: { authorization: token } }
         )
         .then(() => {
