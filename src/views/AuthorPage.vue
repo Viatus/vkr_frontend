@@ -8,18 +8,31 @@
       <img
         v-if="image"
         :src="image"
-        class="row-span-3 rounded-none lg:rounded-lg shadow-xl hidden lg:block m-6"
+        class="
+          row-span-3
+          rounded-none
+          lg:rounded-lg
+          shadow-xl
+          hidden
+          lg:block
+          m-6
+        "
       />
       <div class="col-span-3 col-start-2 row-span-4 flex-col align-middle">
         <h1 class="text-3xl font-bold pt-8 lg:pt-0">{{ info.name }}</h1>
         <div
-          class="mx-auto lg:mx-0 w-4/5 pt-3 border-b-2 border-green-600 opacity-25"
+          class="
+            mx-auto
+            lg:mx-0
+            w-4/5
+            pt-3
+            border-b-2 border-green-600
+            opacity-25
+          "
         ></div>
-        <!-- Я забыл добавить это поле в базу, так что пусть пока просто тут полежит
         <h1 v-if="info.country" id="country">
           {{ info.country }}
         </h1>
-        -->
         <div class="p-6">
           <label for="description">Краткая информация</label>
           <h1 id="description" class="text-xl">{{ info.description }}</h1>

@@ -37,10 +37,13 @@
     <Modal v-model="showNewDiscussionModal">
       <div class="modal">
         <h1>Добавить обсуждение</h1>
-        <input type="text" v-model="discussionTitle" />
+        <input
+          type="text"
+          placeholder="Название обсуждениә"
+          v-model="discussionTitle"
+        />
         <textarea
           placeholder="Первый комментарий"
-          id="reviewText"
           v-model="discussionContent"
           class="
             pt-3
@@ -64,7 +67,157 @@
     </Modal>
   </div>
 
-  <div class="min-h-screen p-0 sm:p-12">
+  <div>
+    <Modal v-model="shoNewRealtionModal">
+      <div class="modal">
+        <h1>Добавить связанное произведение</h1>
+        <input
+          type="text"
+          v-model="relationModalTextSearch"
+          placeholder="Название связанного произведения"
+          @input="searchTextChanged()"
+          @focus="setSearchOptions(true)"
+          @blur="setSearchOptions(false)"
+        />
+        <input
+          type="text"
+          placeholder="Положение этого произведения"
+          v-model="thisCreationStanding"
+        />
+        <input
+          placeholder="Положение связанного произведения"
+          v-model="otherCreationStanding"
+          type="text"
+        />
+        <button @click="shoNewRealtionModal = false">Закрыть</button>
+        <button @click="addRelatedCreation()">Отправить</button>
+        <transition
+          enter-active-class="transition ease-out duration-100"
+          enter-class="transform opacity-0 scale-95"
+          enter-to-class="transform opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-75"
+          leave-class="transform opacity-100 scale-100"
+          leave-to-class="transform opacity-0 scale-95"
+        >
+          <div
+            v-if="searchOptionsShow"
+            class="
+              origin-top-left
+              absolute
+              left-0
+              mt-2
+              w-1/6
+              rounded-md
+              shadow-lg
+              text-sm
+              overflow-hidden
+              border
+              z-20
+              bg-white
+            "
+          >
+            <ul
+              v-if="realtionModalCreations.length != 0"
+              class="divide-y divide-gray-300 overflow-auto h-full"
+            >
+              <li
+                v-for="creation in realtionModalCreations"
+                :key="creation.id"
+                class="hover:bg-gray-100"
+              >
+                <button
+                  v-if="creation.id != $route.params.id"
+                  @click="
+                    otherCreationId = creation.id;
+                    relationModalTextSearch = creation.Creation_Names[0].name;
+                  "
+                >
+                  {{ creation.Creation_Names[0].name }}
+                </button>
+              </li>
+            </ul>
+            <label v-if="realtionModalCreations.length == 0">
+              Ничего не найдено
+            </label>
+          </div>
+        </transition>
+      </div>
+    </Modal>
+  </div>
+
+  <div>
+    <Modal v-model="showAddAuthorModal">
+      <div class="modal">
+        <h1>Добавить автора</h1>
+        <input
+          type="text"
+          v-model="authorModalTextSearch"
+          placeholder="Имя автора"
+          @input="authorSearchTextChanged()"
+          @focus="setAuthorSearchOptions(true)"
+          @blur="setAuthorSearchOptions(false)"
+        />
+        <select v-model="newAuthorRole" class="form-select">
+          <option>Выберите роль</option>
+          <option v-for="role in roles" :value="role.name" :key="role.id">
+            {{ role.name }}
+          </option>
+        </select>
+
+        <button @click="showAddAuthorModal = false">Закрыть</button>
+        <button @click="addAuthor()">Отправить</button>
+        <transition
+          enter-active-class="transition ease-out duration-100"
+          enter-class="transform opacity-0 scale-95"
+          enter-to-class="transform opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-75"
+          leave-class="transform opacity-100 scale-100"
+          leave-to-class="transform opacity-0 scale-95"
+        >
+          <div
+            v-if="authorSearchOptionsShow"
+            class="
+              origin-top-left
+              absolute
+              left-0
+              mt-2
+              w-1/6
+              rounded-md
+              shadow-lg
+              text-sm
+              overflow-hidden
+              border
+              z-20
+              bg-white
+            "
+          >
+            <ul
+              v-if="modalAuthors.length != 0"
+              class="divide-y divide-gray-300 overflow-auto h-full"
+            >
+              <li
+                v-for="author in modalAuthors"
+                :key="author.id"
+                class="hover:bg-gray-100"
+              >
+                <button
+                  @click="
+                    newAuthorId = author.id;
+                    authorModalTextSearch = author.name;
+                  "
+                >
+                  {{ author.name }}
+                </button>
+              </li>
+            </ul>
+            <label v-if="modalAuthors.length == 0"> Ничего не найдено </label>
+          </div>
+        </transition>
+      </div>
+    </Modal>
+  </div>
+
+  <div class="min-h-screen">
     <custom-header />
     <div v-if="loading">
       <label> Загрузка </label>
@@ -102,7 +255,7 @@
           :max-rating="10"
           :read-only="true"
         />
-        <p @click="showReviewModal = true">Оставить отзыв</p>
+        <button @click="showReviewModal = true">Оставить отзыв</button>
         <div class="">
           <h1 v-if="info.country" id="country">
             {{ info.country }} {{ info.age_rating }}
@@ -119,10 +272,55 @@
         </ul>
         <ul class="">
           <li v-for="inv in involvement" :key="inv.id">
-            <label>{{ inv.name }} </label>
-            <label>{{ inv.Authors[0].name }} </label>
+            <router-link :to="{ path: `/authors/${inv.Authors[0].id}` }">
+              <label>{{ inv.name }} </label>
+              <label>{{ inv.Authors[0].name }} </label>
+            </router-link>
           </li>
         </ul>
+        <button
+          @click="
+            showAddAuthorModal = true;
+            fetchRoles();
+          "
+        >
+          Добавить автора
+        </button>
+
+        <div>
+          <ul>
+            <li
+              v-for="relatedCreation in relatedCreations"
+              :key="relatedCreation.id"
+            >
+              <router-link
+                v-if="relatedCreation.firstCreationId == $route.params.id"
+                :to="{ path: `/creations/${relatedCreation.secondCreationId}` }"
+                >{{
+                  relatedCreation.secondCreationNames
+                    ? relatedCreation.secondCreationNames[0].name
+                    : relatedCreation.secondCreationId
+                }}
+                :
+                {{ relatedCreation.secondCreationStanding }}
+              </router-link>
+              <router-link
+                v-if="relatedCreation.secondCreationId == $route.params.id"
+                :to="{ path: `/creations/${relatedCreation.firstCreationId}` }"
+                >{{
+                  relatedCreation.firstCreationNames
+                    ? relatedCreation.firstCreationNames[0].name
+                    : relatedCreation.firstCreationId
+                }}
+                :
+                {{ relatedCreation.firstCreationStanding }}
+              </router-link>
+            </li>
+          </ul>
+          <button @click="shoNewRealtionModal = true">
+            Добавить связанное произведение
+          </button>
+        </div>
       </div>
     </div>
     <div class="grid grid-cols-2 grid-rows-1">
@@ -134,6 +332,7 @@
               :creation_id="creation.id"
               :img_height="80"
               :img_width="80"
+              :isApproved="true"
             />
           </li>
         </ul>
@@ -146,6 +345,7 @@
               :creation_id="creation.id"
               :img_height="80"
               :img_width="80"
+              :isApproved="true"
             />
           </li>
         </ul>
@@ -172,11 +372,11 @@ export default {
   data() {
     return {
       info: null,
-      similar: null,
-      similarByAuthor: null,
+      similar: [],
+      similarByAuthor: [],
       isAdmin: false,
       image: require("@/assets/placeholder.png"),
-      tags: null,
+      tags: [],
       involvment: null,
       loading: true,
       rating: null,
@@ -186,6 +386,21 @@ export default {
       discussionContent: "",
       discussionTitle: "",
       showNewDiscussionModal: false,
+      relatedCreations: [],
+      thisCreationStanding: "",
+      otherCreationStanding: "",
+      otherCreationId: null,
+      shoNewRealtionModal: false,
+      relationModalTextSearch: "",
+      realtionModalCreations: [],
+      searchOptionsShow: false,
+      showAddAuthorModal: false,
+      roles: [],
+      newAuthorRole: null,
+      authorSearchOptionsShow: false,
+      authorModalTextSearch: "",
+      modalAuthors: [],
+      newAuthorId: null,
     };
   },
   async created() {
@@ -195,6 +410,7 @@ export default {
     this.fetchinvolved();
     this.fetchRating();
     this.fetchSimilarByAuthors();
+    this.fetchRelatedCreations();
     this.isAdmin = localStorage.getItem("isAdmin");
   },
   methods: {
@@ -354,43 +570,161 @@ export default {
           alert(error);
         });
     },
+    fetchRelatedCreations() {
+      const fetchedId = this.$route.params.id;
+      axios
+        .get(`${APIURL}/creation-relations/${this.$route.params.id}`)
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          this.relatedCreations = result.data.result;
+          for (var relatedCreation of this.relatedCreations) {
+            axios
+              .get(`${APIURL}/creations/${relatedCreation.firstCreationId}`)
+              .then((creationInfo) => {
+                relatedCreation.firstCreationNames =
+                  creationInfo.data.result.Creation_Names;
+              })
+              .catch((error) => {
+                alert(error);
+              });
+            axios
+              .get(`${APIURL}/creations/${relatedCreation.secondCreationId}`)
+              .then((creationInfo) => {
+                relatedCreation.secondCreationNames =
+                  creationInfo.data.result.Creation_Names;
+              })
+              .catch((error) => {
+                alert(error);
+              });
+          }
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    },
+    addRelatedCreation() {
+      if (this.otherCreationId === null) {
+        alert("Не указано связанное произведение");
+        return;
+      }
+      const fetchedId = this.$route.params.id;
+      const token = localStorage.getItem("token");
+      axios
+        .post(
+          `${APIURL}/creation-relations`,
+          {
+            firstCreationId: this.$route.params.id,
+            secondCreationId: this.otherCreationId,
+            firstCreationStanding: this.thisCreationStanding,
+            secondCreationStanding: this.otherCreationStanding,
+          },
+          { headers: { authorization: token } }
+        )
+        .then(() => {
+          if (this.$route.params.id !== fetchedId) return;
+          this.shoNewRealtionModal = false;
+          //Оповестить пользователя что все классно
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    },
+    searchTextChanged() {
+      if (this.relationModalTextSearch == "") {
+        this.relationModalTextSearch = null;
+        return;
+      }
+      const fetchedId = this.$route.params.id;
+      axios
+        .get(`${APIURL}/creations-search`, {
+          params: { string: this.relationModalTextSearch },
+        })
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          if (result.data.result !== undefined) {
+            this.realtionModalCreations = result.data.result;
+          }
+        })
+        .catch((error) => {
+          alert(`${error}`);
+        });
+    },
+    setSearchOptions(flag) {
+      this.searchOptionsShow = flag;
+    },
+    fetchRoles() {
+      const fetchedId = this.$route.params.id;
+      axios
+        .get(`${APIURL}/roles`)
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          if (result.data.result !== undefined) {
+            this.roles = result.data.result;
+          }
+        })
+        .catch((error) => {
+          alert(`${error}`);
+        });
+    },
+    setAuthorSearchOptions(flag) {
+      this.authorSearchOptionsShow = flag;
+    },
+    authorSearchTextChanged() {
+      if (this.authorModalTextSearch == "") {
+        this.authorModalTextSearch = null;
+        return;
+      }
+      const fetchedId = this.$route.params.id;
+      axios
+        .get(`${APIURL}/authors`, {
+          params: { string: this.authorModalTextSearch },
+        })
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          if (result.data.result !== undefined) {
+            this.modalAuthors = result.data.result;
+          }
+        })
+        .catch((error) => {
+          alert(`${error}`);
+        });
+    },
+    addAuthor() {
+      if (this.authorModalTextSearch == "") {
+        return;
+      }
+      const token = localStorage.getItem("token");
+      var roleId;
+      for (var role of this.roles) {
+        if (role.name == this.newAuthorRole) {
+          roleId = role.id;
+        }
+      }
+
+      axios
+        .post(
+          `${APIURL}/author-role`,
+          {
+            creation_id: this.$route.params.id,
+            author_id: this.newAuthorId,
+            role_id: roleId,
+          },
+          {
+            headers: {
+              authorization: token,
+            },
+          }
+        )
+        .then(() => {})
+        .catch((err) => {
+          alert(err.message);
+        });
+    },
   },
 };
 </script>
 
 <style scoped>
-.wrapper {
-  display: grid;
-}
-.creation_type {
-  opacity: 0.5;
-}
-
-.outer-container {
-  display: flex;
-  flex-direction: row;
-}
-
-.info_container {
-  margin-bottom: 2rem;
-  margin-right: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.details_container {
-  margin-left: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  align-items: flex-start;
-}
-
-.name-label {
-  font-size: large;
-}
-
 .modal {
   width: 700px;
   padding: 30px;

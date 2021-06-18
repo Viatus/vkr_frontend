@@ -90,6 +90,7 @@
                 :creation_id="creation.id"
                 :img_height="30"
                 :img_width="30"
+                :isApproved="true"
               />
             </li>
           </ul>

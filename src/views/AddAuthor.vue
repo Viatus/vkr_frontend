@@ -63,7 +63,7 @@ export default {
         date: null,
       },
       authors: null,
-      url: require("@/assets/logo.png"),
+      url: require("@/assets/placeholder.png"),
       locale: ru,
       image: null,
     };
