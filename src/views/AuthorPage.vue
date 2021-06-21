@@ -16,30 +16,38 @@
           hidden
           lg:block
           m-6
+          pr-6
+          max-w-xs
         "
       />
-      <div class="col-span-3 col-start-2 row-span-4 flex-col align-middle">
-        <h1 class="text-3xl font-bold pt-8 lg:pt-0">{{ info.name }}</h1>
+      <div class="pl-12 col-span-3 col-start-2 row-span-3 flex-col align-middle">
+        <h1 class="text-3xl font-bold pt-8 lg:pt-4">{{ info.name }}</h1>
         <div
           class="
             mx-auto
             lg:mx-0
-            w-4/5
+            w-full
             pt-3
             border-b-2 border-green-600
             opacity-25
           "
         ></div>
-        <h1 v-if="info.country" id="country">
-          {{ info.country }}
+        <h1 v-if="info.country" id="country" class="text-base">
+          Страна: {{ info.country }}
         </h1>
-        <div class="p-6">
-          <label for="description">Краткая информация</label>
-          <h1 id="description" class="text-xl">{{ info.description }}</h1>
+        <div>
+          <label for="description" class="text-base text-bold">Краткая информация</label>
+          <h1 id="description" class="text-base pl-4">{{ info.description }}</h1>
+        </div>
+        <div v-if="info.birthday !== undefined">
+          <h1 id="description" class="text-base">День рождения: {{ info.birthday.slice(0,10) }}</h1>
+        </div>
+        <div v-if="info.birthday !== undefined">
+          <h1 id="description" class="text-base">День рождения: {{ info.birthday.slice(0,10) }}</h1>
         </div>
       </div>
     </div>
-    <div class="h-80 col-start-1 col-span-1">
+    <div class="h-80 col-start-1 col-span-4">
       <h2>Произведения автора</h2>
       <ul class="divide-y divide-gray-300 overflow-auto h-full">
         <li v-for="creation in creations" :key="creation.id">
@@ -47,6 +55,7 @@
             :creation_id="creation.id"
             :img_height="80"
             :img_width="80"
+            :isApproved="true"
           />
         </li>
       </ul>
@@ -89,6 +98,9 @@ export default {
           if (this.$route.params.id !== fetchedId) return;
           if (result.data.result !== undefined) {
             this.info = result.data.result;
+            if (this.info.image !== undefined) {
+              this.image = "data:image/jpg;base64," + this.info.image;
+            }
           }
           this.loading = false;
         })

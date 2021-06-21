@@ -5,7 +5,7 @@
       <div class="row-span-1 row-start-2 col-span-1 col-start-1 pt-4 pr-4">
         <h2>Одобренные произведения</h2>
         <ul class="divide-y divide-gray-300 overflow-auto h-full" v-if="approvedCreations.length != 0">
-          <li v-for="creation in approvedCreations" :key="creation.id">
+          <li v-for="creation in approvedCreations" :key="creation.id" class="hover:bg-gray-100">
             <mini-creation-info
               :creation_id="creation.id"
               :img_height="80"
@@ -19,7 +19,7 @@
       <div class="row-span-1 row-start-2 col-span-1 col-start-2 pt-4 pl-4">
         <h2>Неодобренные произведения</h2>
         <ul class="divide-y divide-gray-300 overflow-auto h-full" v-if="unapprovedCreations.length != 0">
-          <li v-for="creation in unapprovedCreations" :key="creation.id">
+          <li v-for="creation in unapprovedCreations" :key="creation.id" class="hover:bg-gray-100">
             <mini-creation-info
               :creation_id="creation.id"
               :img_height="80"
@@ -33,7 +33,7 @@
       <div class="row-span-1 row-start-1 col-span-1 col-start-1 pt-4 pr-4 pb-4">
         <h2>Рекоммендации</h2>
         <ul class="divide-y divide-gray-300 overflow-auto h-full" v-if="recommendedCreations.length != 0">
-          <li v-for="creation in recommendedCreations" :key="creation.id">
+          <li v-for="creation in recommendedCreations" :key="creation.id" class="hover:bg-gray-100">
             <mini-creation-info
               :creation_id="creation.id"
               :img_height="80"

@@ -128,7 +128,7 @@ export default {
         this.isError = false;
         this.alertText = "Вход произведен успешно";
         this.alertOpen = true;
-        this.$router.push("/main-list");
+        this.$router.push("/main-page");
       } catch (error) {
         this.isError = true;
         this.alertText = "Произошла ошибка при входе";

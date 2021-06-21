@@ -14,5 +14,6 @@ export default {
 #app {
   margin: 0 auto;
   width: 70vw;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
 }
 </style>

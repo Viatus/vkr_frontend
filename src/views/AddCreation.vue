@@ -1,101 +1,110 @@
 <template>
-  <div class="top-container">
-    <custom-header />
-    <div class="parent_container">
-      <h1>Добавить произведение</h1>
-      <div class="outer_container">
-        <img v-if="url" :src="url" class="image_preview" />
-        <form class="input_container">
+  <custom-header />
+  <h1>Добавить произведение</h1>
+  <div class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center">
+    <img
+      v-if="url"
+      :src="url"
+      class="
+        row-span-1
+        rounded-none
+        lg:rounded-lg
+        shadow-xl
+        hidden
+        lg:block
+        m-6
+      "
+    />
+    <form class="flex flex-col items-stretch">
+      <MDBInput
+        label="Название произведения"
+        v-model="form.name"
+        type="text"
+        class="pt-2"
+      />
+      <select v-model="form.type" class="form-select">
+        <option>Выберите жанр</option>
+        <option v-for="genre in genres" :value="genre.name" :key="genre.id">
+          {{ genre.name }}
+        </option>
+      </select>
+      <div v-if="form.type == 'Книга'" class="pt-2">
+        <MDBInput label="ISBN" v-model="isbn" type="text" />
+        <MDBBtn tag="a" color="light" @click="fillFieldsByISBN()">
+          Заполнить по ISBN
+        </MDBBtn>
+      </div>
+      <MDBInput
+        label="Страна"
+        v-model="form.country"
+        type="text"
+        class="pt-2"
+      />
+      <MDBInput
+        label="Возрастной рейтниг"
+        v-model="form.ageRating"
+        type="text"
+        class="pt-2"
+      />
+      <div class="flex flex-row pt-2">
+        <label class="pr-4">Дата</label>
+        <datepicker v-model="form.date" :locale="locale" class="border" />
+      </div>
+      <ul class="pt-2">
+        <label>Тэги</label>
+        <li v-for="tag in tags" :key="tag.id">
           <input
-            v-model="form.name"
-            type="text"
-            placeholder="Название произведения"
-            class="form-input"
+            type="checkbox"
+            :value="tag.name"
+            name="tag"
+            v-model="checkedTags"
           />
-          <select v-model="form.type" class="form-select">
-            <option>Выберите жанр</option>
-            <option v-for="genre in genres" :value="genre.name" :key="genre.id">
-              {{ genre.name }}
+          <label :title="tag.description">{{ tag.name }} </label>
+        </li>
+      </ul>
+      <ul class="form-list">
+        <li
+          v-for="choosenAuthor in form.choosenAuthors"
+          :key="choosenAuthor.name"
+          class="author-list-element"
+        >
+          <select v-model="choosenAuthor.name" class="form-select">
+            <option>Выберите автора</option>
+            <option
+              v-for="author in authors"
+              :value="author.name"
+              :key="author.id"
+            >
+              {{ author.name }}
             </option>
           </select>
-          <div v-if="form.type == 'Книга'">
-            <input v-model="isbn" type="text" placeholder="ISBN" />
-            <button type="button" @click="fillFieldsByISBN()">
-              Заполнить по ISBN
-            </button>
-          </div>
-          <input
-            v-model="form.country"
-            type="text"
-            placeholder="Страна"
-            class="form-input"
-          />
-          <input
-            v-model="form.ageRating"
-            type="text"
-            placeholder="Возрастной рейтниг"
-            class="form-input"
-          />
-          <datepicker v-model="form.date" :locale="locale" />
-          <ul class="form-list">
-            <li v-for="tag in tags" :key="tag.id">
-              <input
-                type="checkbox"
-                :value="tag.name"
-                name="tag"
-                v-model="checkedTags"
-              />
-              <label :title="tag.description">{{ tag.name }} </label>
-            </li>
-          </ul>
-          <ul class="form-list">
-            <li
-              v-for="choosenAuthor in form.choosenAuthors"
-              :key="choosenAuthor.name"
-              class="author-list-element"
-            >
-              <select v-model="choosenAuthor.name" class="form-select">
-                <option>Выберите автора</option>
-                <option
-                  v-for="author in authors"
-                  :value="author.name"
-                  :key="author.id"
-                >
-                  {{ author.name }}
-                </option>
-              </select>
-              <select v-model="choosenAuthor.role" class="form-select">
-                <option>Выберите роль</option>
-                <option v-for="role in roles" :value="role.name" :key="role.id">
-                  {{ role.name }}
-                </option>
-              </select>
-              <router-link to="/add-author" title="Добавить автора">+</router-link>
-            </li>
-          </ul>
-          <button type="button" @click="setupNewAuthor()">
-            Добавить автора
-          </button>
-          <textarea
-            v-model="form.description"
-            type="text"
-            placeholder="Описание"
-            class="form-textarea"
-          />
-          <label> Добавить обложку: </label>
-          <input
-            type="file"
-            accept="image/*"
-            @change="previewImage($event)"
-            id="file-input"
-          />
-          <button type="button" @click="sendCreation">Отправить</button>
-          <button type="button" @click="$router.push('/main-list')">
-            Назад
-          </button>
-        </form>
-      </div>
-    </div>
+          <select v-model="choosenAuthor.role" class="form-select">
+            <option>Выберите роль</option>
+            <option v-for="role in roles" :value="role.name" :key="role.id">
+              {{ role.name }}
+            </option>
+          </select>
+          <router-link to="/add-author" title="Добавить автора">+</router-link>
+        </li>
+      </ul>
+      <MDBBtn tag="a" color="light" @click="setupNewAuthor()"
+        >Добавить автора</MDBBtn
+      >
+      <MDBTextarea
+        v-model="form.description"
+        label="Описание"
+        rows="4"
+        class="pt-4"
+      />
+      <label> Добавить обложку: </label>
+      <input
+        type="file"
+        accept="image/*"
+        @change="previewImage($event)"
+        id="file-input"
+      />
+      <MDBBtn tag="a" color="light" @click="sendCreation">Отправить</MDBBtn>
+    </form>
   </div>
 </template>
 <script>
@@ -105,11 +114,15 @@ import { APIURL, BOOKAPIURL } from "../constants";
 import Datepicker from "vue3-datepicker";
 import { ru } from "date-fns/locale";
 import CustomHeader from "../components/CustomHeader";
+import { MDBBtn, MDBInput, MDBTextarea } from "mdb-vue-ui-kit";
 
 export default {
   components: {
-    "datepicker": Datepicker,
+    datepicker: Datepicker,
     "custom-header": CustomHeader,
+    MDBInput,
+    MDBBtn,
+    MDBTextarea,
   },
   data() {
     return {
@@ -215,6 +228,10 @@ export default {
         alert("Не выбран жанр произведения");
         return;
       }
+      if (this.form.description.length >= 255) {
+        alert("Слишком длинное описание");
+        return;
+      }
       const token = localStorage.getItem("token");
       var bodyFormData = new FormData();
       bodyFormData.append("cover", this.image);
@@ -277,7 +294,7 @@ export default {
       this.url = URL.createObjectURL(this.image);
     },
     setupNewAuthor() {
-      let newAuthor = new Object();
+      let newAuthor = { name: "Выберите автора", role: "Выберите роль" };
       this.form.choosenAuthors.push(newAuthor);
     },
     fillFieldsByISBN() {
@@ -303,64 +320,4 @@ export default {
 };
 </script>
 <style scoped>
-.top-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.parent_container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-items: center;
-}
-
-.input_container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.outer_container {
-  display: flex;
-  flex-direction: row;
-  justify-items: stretch;
-  align-items: stretch;
-}
-
-.image_preview {
-  max-width: 30%;
-  margin: 10px;
-}
-
-.form-input {
-  border: none;
-  border-bottom: 1px solid black;
-}
-
-.form-input:focus {
-  outline: none;
-}
-
-.form-select {
-  border: none;
-  border-bottom: 1px solid black;
-}
-
-.form-select:focus {
-  outline: none;
-}
-
-.form-list {
-  list-style-type: none;
-}
-
-.form-datepicker-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-datepicker:focus {
-  outline: none;
-}
 </style>

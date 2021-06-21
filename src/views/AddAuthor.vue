@@ -1,44 +1,52 @@
 <template>
-  <div class="top-container">
-    <custom-header />
-    <div class="parent_container">
-      <h1>Добавить автора</h1>
-      <div class="outer_container">
-        <img v-if="url" :src="url" class="image_preview" />
-        <form class="input_container">
-          <input
-            v-model="form.name"
-            type="text"
-            placeholder="Полное имя"
-            class="form-input"
-          />
-          <input
-            v-model="form.country"
-            type="text"
-            placeholder="Страна"
-            class="form-input"
-          />
-          <datepicker v-model="form.date" :locale="locale" />
-          <textarea
-            v-model="form.description"
-            type="text"
-            placeholder="Описание"
-            class="form-textarea"
-          />
-          <label> Добавить фотографию: </label>
-          <input
-            type="file"
-            accept="image/*"
-            @change="previewImage($event)"
-            id="file-input"
-          />
-          <button type="button" @click="sendAuthor">Отправить</button>
-          <button type="button" @click="$router.push('/main-list')">
-            Назад
-          </button>
-        </form>
+  <custom-header />
+  <h1>Добавить автора</h1>
+  <div class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center">
+    <img
+      v-if="url"
+      :src="url"
+      class="
+        row-span-1
+        rounded-none
+        lg:rounded-lg
+        shadow-xl
+        hidden
+        lg:block
+        m-6
+      "
+    />
+    <form class="flex flex-col items-stretch">
+      <MDBInput
+        label="Имя автора"
+        v-model="form.name"
+        type="text"
+        class="pt-2"
+      />
+      <MDBInput
+        label="Страна"
+        v-model="form.country"
+        type="text"
+        class="pt-2"
+      />
+      <div class="flex flex-row pt-2">
+        <label class="pr-4">День рождения</label>
+        <datepicker v-model="form.date" :locale="locale" class="border" />
       </div>
-    </div>
+      <MDBTextarea
+        v-model="form.description"
+        label="Описание"
+        rows="4"
+        class="pt-4"
+      />
+      <label> Добавить фотографию: </label>
+      <input
+        type="file"
+        accept="image/*"
+        @change="previewImage($event)"
+        id="file-input"
+      />
+      <MDBBtn tag="a" color="light" @click="sendAuthor">Отправить</MDBBtn>
+    </form>
   </div>
 </template>
 <script>
@@ -48,11 +56,15 @@ import { APIURL } from "../constants";
 import Datepicker from "vue3-datepicker";
 import { ru } from "date-fns/locale";
 import CustomHeader from "../components/CustomHeader";
+import { MDBBtn, MDBInput, MDBTextarea } from "mdb-vue-ui-kit";
 
 export default {
   components: {
     datepicker: Datepicker,
     "custom-header": CustomHeader,
+    MDBInput,
+    MDBBtn,
+    MDBTextarea,
   },
   data() {
     return {
@@ -109,7 +121,9 @@ export default {
           },
         })
         .then((result) => {
-            alert(result.status);
+          if (result.status == 201) {
+            alert("Добавление прошло успешно");
+          }
         })
         .catch((error) => {
           alert(error.message);

@@ -2,7 +2,7 @@
   <div v-if="isLoading">Идет загрузка</div>
   <router-link
     v-if="!isLoading"
-    class="p-4 flex space-x-4"
+    class="flex p-2 space-x-4"
     :to="
       isApproved
         ? { path: `/creations/${creation.id}` }
@@ -12,18 +12,18 @@
     <img
       :src="image"
       alt=""
-      class="flex-none w-18 h-18 rounded-lg object-cover"
+      class="rounded-lg object-cover"
       :width="img_width"
       :height="img_height"
     />
-    <div class="min-w-0 relative flex-auto sm:pr-20 lg:pr-0 xl:pr-20">
-      <h2 class="text-lg font-semibold text-black mb-0.5">
-        {{ creation.Creation_Names[0].name }}
+    <div class="min-w-0 relative sm:pr-20 lg:pr-0 xl:pr-20 w-full">
+      <h2 class="text-sm font-semibold text-black mb-0.5">
+        {{ creation.Creation_Names?creation.Creation_Names[0].name:"" }}
       </h2>
-      <dl class="flex flex-wrap text-sm font-medium whitespace-pre">
+      <dl class="flex flex-wrap text-xs font-medium whitespace-pre w-full">
         <div>
           <dt class="sr-only">Жанр</dt>
-          <dd>{{ creation.genre }}</dd>
+          <dd>{{ creation.genre?creation.genre:""  }}</dd>
         </div>
         <div
           class="
@@ -54,7 +54,7 @@
           <dd>
             {{
               creation.rating == null
-                ? "Нет данных"
+                ? 0
                 : Math.round((creation.rating + Number.EPSILON) * 100) / 100
             }}
           </dd>
@@ -94,6 +94,9 @@ export default {
           if (this.$route.params.id !== fetchedId) return;
           if (result.data.result !== undefined) {
             this.creation = result.data.result;
+            if (this.creation.image !== undefined) {
+              this.image = "data:image/jpg;base64," + this.creation.image;
+            }
           }
           axios
             .get(`${APIURL}/genres`)
