@@ -20,7 +20,9 @@
           max-w-xs
         "
       />
-      <div class="pl-12 col-span-3 col-start-2 row-span-3 flex-col align-middle">
+      <div
+        class="pl-12 col-span-3 col-start-2 row-span-3 flex-col align-middle"
+      >
         <h1 class="text-3xl font-bold pt-8 lg:pt-4">{{ info.name }}</h1>
         <div
           class="
@@ -36,14 +38,22 @@
           Страна: {{ info.country }}
         </h1>
         <div>
-          <label for="description" class="text-base text-bold">Краткая информация</label>
-          <h1 id="description" class="text-base pl-4">{{ info.description }}</h1>
+          <label for="description" class="text-base text-bold"
+            >Краткая информация</label
+          >
+          <h1 id="description" class="text-base pl-4">
+            {{ info.description }}
+          </h1>
         </div>
         <div v-if="info.birthday !== undefined">
-          <h1 id="description" class="text-base">День рождения: {{ info.birthday.slice(0,10) }}</h1>
+          <h1 id="description" class="text-base">
+            День рождения: {{ info.birthday.slice(0, 10) }}
+          </h1>
         </div>
         <div v-if="info.birthday !== undefined">
-          <h1 id="description" class="text-base">День рождения: {{ info.birthday.slice(0,10) }}</h1>
+          <h1 id="description" class="text-base">
+            День рождения: {{ info.birthday.slice(0, 10) }}
+          </h1>
         </div>
       </div>
     </div>
@@ -105,7 +115,11 @@ export default {
           this.loading = false;
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchAuthorCreations() {
@@ -119,7 +133,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },

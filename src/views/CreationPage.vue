@@ -294,7 +294,7 @@
     <div v-if="loading">
       <label> Загрузка </label>
     </div>
-    <div v-if="!loading" class="grid grid-cols-4 grid-rows-4 pt-4">
+    <div v-if="!loading" class="grid grid-cols-5 grid-rows-4 pt-4">
       <img
         v-if="image"
         :src="image"
@@ -305,8 +305,8 @@
           shadow-xl
           hidden
           lg:block
-          m-6
-          max-w-xs
+          p-2
+          col-sapn-1 col-start-1
         "
       />
       <div
@@ -434,6 +434,26 @@
           >
         </div>
       </div>
+
+      <div
+        class="pl-12 col-span-1 col-start-5 row-span-4 flex-col align-middle"
+      >
+        <h2>Участники</h2>
+        <ul class="divide-y divide-gray-300 overflow-auto h-full">
+          <li
+            v-for="inv in involvement"
+            :key="inv.id"
+            class="hover:bg-gray-100"
+          >
+            <mini-author-info
+              :author_id="inv.id"
+              :img_height="80"
+              :img_width="80"
+              :role="inv.name"
+            />
+          </li>
+        </ul>
+      </div>
     </div>
     <div class="grid grid-cols-2 grid-rows-1">
       <div class="h-80 col-start-1 col-span-1">
@@ -505,6 +525,7 @@ import { APIURL } from "../constants";
 import CustomHeader from "../components/CustomHeader";
 import StarRating from "vue-star-rating";
 import MiniCreationInfo from "../components/MiniCreationInfo";
+import MiniAuthorInfo from "../components/MiniAuthorInfo";
 import {
   MDBModal,
   MDBModalHeader,
@@ -519,6 +540,7 @@ export default {
   components: {
     "custom-header": CustomHeader,
     "mini-creation-info": MiniCreationInfo,
+    "mini-author-info": MiniAuthorInfo,
     StarRating,
     MDBModal,
     MDBModalHeader,
@@ -605,11 +627,19 @@ export default {
               }
             })
             .catch((error) => {
-              alert(`${error}`);
+              this.$notify({
+                title: "Произошла ошибка",
+                text: error.response.data.error,
+                type: "error",
+              });
             });
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchSimilar() {
@@ -625,7 +655,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error.message}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     deleteCreation() {
@@ -639,10 +673,14 @@ export default {
           { headers: { authorization: token } }
         )
         .then(() => {
-          this.$router.push("/main-list");
+          this.$router.push("/main-page");
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchCreationTags() {
@@ -654,7 +692,11 @@ export default {
           this.tags = result.data.result;
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchinvolved() {
@@ -666,7 +708,11 @@ export default {
           this.involvment = result.data.result;
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchRating() {
@@ -678,7 +724,11 @@ export default {
           this.rating = result.data.average;
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchSimilarByAuthors() {
@@ -692,7 +742,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error.message}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     sendReview() {
@@ -711,7 +765,11 @@ export default {
           //Оповестить пользователя что все классно
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     addDiscussion() {
@@ -733,7 +791,11 @@ export default {
           //Оповестить пользователя что все классно
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
       this.showNewDiscussionModal = false;
     },
@@ -752,7 +814,11 @@ export default {
                   creationInfo.data.result.Creation_Names;
               })
               .catch((error) => {
-                alert(error);
+                this.$notify({
+                  title: "Произошла ошибка",
+                  text: error.response.data.error,
+                  type: "error",
+                });
               });
             axios
               .get(`${APIURL}/creations/${relatedCreation.secondCreationId}`)
@@ -761,12 +827,20 @@ export default {
                   creationInfo.data.result.Creation_Names;
               })
               .catch((error) => {
-                alert(error);
+                this.$notify({
+                  title: "Произошла ошибка",
+                  text: error.response.data.error,
+                  type: "error",
+                });
               });
           }
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     addRelatedCreation() {
@@ -793,7 +867,11 @@ export default {
           //Оповестить пользователя что все классно
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
       this.shoNewRealtionModal = false;
     },
@@ -814,7 +892,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     setSearchOptions(flag) {
@@ -831,7 +913,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     setAuthorSearchOptions(flag) {
@@ -854,7 +940,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     addAuthor() {
@@ -884,8 +974,12 @@ export default {
           }
         )
         .then(() => {})
-        .catch((err) => {
-          alert(err.message);
+        .catch((error) => {
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
       this.showAddAuthorModal = false;
     },
@@ -907,8 +1001,12 @@ export default {
           }
         )
         .then(() => {})
-        .catch((err) => {
-          alert(err.message);
+        .catch((error) => {
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
       this.showNewNameModal = false;
     },
@@ -921,7 +1019,11 @@ export default {
           this.discussions = result.data.result;
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },

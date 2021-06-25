@@ -2,15 +2,16 @@
   <div class="min-h-screen p-0">
     <custom-header />
     <div class="flex flex-row p-4 w-full items-center">
-      <div>
+      <div class="flex-row flex">
         <input
-          type="text"
+          type="search"
           v-model="searchString"
-          class="border border-gray-300 self-center flex-1"
-          placeholder="Искать..."
+          class="form-control"
+          placeholder="Поиск..."
+          aria-label="Search"
         />
-        <button
-          class=""
+        <MDBBtn
+          outline="primary"
           @click="
             {
               page = 1;
@@ -18,16 +19,16 @@
             }
           "
         >
-          Поиск
-        </button>
+          <MDBIcon iconStyle="fas" icon="search"></MDBIcon>
+        </MDBBtn>
       </div>
     </div>
-    <div class="grid grid-rows-1 grid-cols-4">
-      <div class="col-span-3 col-sart-1">
+    <div class="grid grid-rows-1 grid-cols-5">
+      <div class="col-span-4 col-sart-1 pl-2">
         <div v-if="resultsLoaded" class="border border-gray-200">
           <ul
             v-if="creations.length != 0"
-            class="divide-y divide-gray-300 h-full"
+            class="divide-y divide-gray-300 h-full list-none m-0 p-0"
           >
             <li
               v-for="creation in creations"
@@ -46,7 +47,8 @@
         </div>
 
         <div class="flex flex-row justify-between pb-2">
-          <button
+          <MDBBtn
+            outline="primary"
             class="
               relative
               inline-flex
@@ -58,15 +60,16 @@
               text-sm
               font-medium
               text-gray-500
-              hover:bg-gray-50
+              hover:bg-gray-100
             "
             v-if="resultsLoaded"
             :disabled="page == 1"
             @click="prevPage()"
           >
-            <span class="">Previous</span>
-          </button>
-          <button
+            <span class="">Предыдущая страница</span>
+          </MDBBtn>
+          <MDBBtn
+            outline="primary"
             class="
               relative
               inline-flex
@@ -78,7 +81,7 @@
               text-sm
               font-medium
               text-gray-500
-              hover:bg-gray-50
+              hover:bg-gray-100
             "
             :disabled="
               creations.length < 1 ||
@@ -88,13 +91,13 @@
             v-if="resultsLoaded"
             @click="nextPage()"
           >
-            <span class="">Next</span>
-          </button>
+            Следующая страница
+          </MDBBtn>
         </div>
       </div>
-      <div class="col-span-1 col-start-4 border border-gray-200">
+      <div class="col-span-1 col-start-5 border border-gray-200">
         <div class="flex flex-col">
-          <div class="flex flex-col items-center p-6">
+          <div class="flex flex-col items-left p-6">
             <label>Жанры</label>
             <ul class="">
               <li v-for="genre in genres" :key="genre.id">
@@ -108,7 +111,7 @@
               </li>
             </ul>
           </div>
-          <div class="flex flex-col items-center p-6">
+          <div class="flex flex-col items-left p-6">
             <label>Тэги</label>
             <ul class="tags-list">
               <li v-for="tag in tags" :key="tag.id">
@@ -123,7 +126,7 @@
             </ul>
           </div>
         </div>
-        <div class="flex flex-col items-center p-6">
+        <div class="flex flex-col items-left p-6">
           <div class="options">
             <div>
               <label>Сортировать по </label>
@@ -160,10 +163,13 @@ import axios from "axios";
 import { APIURL } from "../constants";
 import CustomHeader from "../components/CustomHeader";
 import MiniCreationInfo from "../components/MiniCreationInfo.vue";
+import { MDBBtn, MDBIcon } from "mdb-vue-ui-kit";
 export default {
   components: {
     "mini-creation-info": MiniCreationInfo,
     "custom-header": CustomHeader,
+    MDBBtn,
+    MDBIcon,
   },
   data() {
     return {
@@ -202,7 +208,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchTags() {
@@ -216,7 +226,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     executeSearch() {
@@ -253,7 +267,11 @@ export default {
           this.resultsLoaded = true;
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     nextPage() {

@@ -104,7 +104,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     approveAuthor() {
@@ -127,7 +131,11 @@ export default {
           this.$router.push("/main-page");
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     deleteAuthor() {
@@ -144,7 +152,11 @@ export default {
           this.$router.push("/main-page");
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },

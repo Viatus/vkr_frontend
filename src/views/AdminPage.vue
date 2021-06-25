@@ -1,103 +1,124 @@
 <template>
-  <custom-header />
-  <div class="grid grid-cols-2 grid-rows-4">
-    <div class="row-span-1 row-start-1 col-span-2 col-start-1">
-      <select v-model="choosenPage" class="main-select" @change="changePage()">
-        <option>Выберите действие</option>
-        <option>Добавить жанр</option>
-        <option>Добавить тэг</option>
-        <option>Добавить роль</option>
-      </select>
-      <div v-if="showGenre" class="genre-container">
-        <input
-          v-model="genreName"
-          type="text"
-          placeholder="Название жанра"
-          class="normal-input"
-        />
-        <input
-          v-model="genreDescription"
-          type="text"
-          placeholder="Описание жанра"
-          class="normal-input"
-        />
-        <button type="button" @click="addGenreRequest()">Отправить</button>
-      </div>
-      <div v-if="showTag" class="tag-container">
-        <input
-          v-model="tagName"
-          type="text"
-          placeholder="Тэг"
-          class="normal-input"
-        />
-        <input
-          v-model="tagDescription"
-          type="text"
-          placeholder="Описание тэга"
-          class="normal-input"
-        />
-        <button type="button" @click="addTagRequest()">Отправить</button>
-      </div>
-      <div v-if="showRole" class="genre-container">
-        <input
-          v-model="roleName"
-          type="text"
-          placeholder="Название роли"
-          class="normal-input"
-        />
-        <input
-          v-model="roleDescription"
-          type="text"
-          placeholder="Описание роли"
-          class="normal-input"
-        />
-        <button type="button" @click="addRoleRequest()">Отправить</button>
-      </div>
-    </div>
-    <div class="row-span-3 row-start-2 col-span-1 col-start-1 pt-4 pl-4">
-      <h2>Неодобренные произведения</h2>
-      <ul
-        class="divide-y divide-gray-300 overflow-auto h-full"
-        v-if="creationsUnapproved.length != 0"
+  <div class="min-h-screen p-0">
+    <custom-header />
+    <div class="grid grid-cols-2 grid-rows-4">
+      <div
+        class="
+          row-span-1 row-start-1
+          col-span-2 col-start-1
+          grid grid-cols-3 grid-rows-1
+        "
       >
-        <li
-          v-for="creation in creationsUnapproved"
-          :key="creation.id"
-          class="hover:bg-gray-100"
-        >
-          <mini-creation-info
-            :creation_id="creation.id"
-            :img_height="80"
-            :img_width="80"
-            :isApproved="false"
+        <div class="col-span-1 col-start-1 flex flex-col p-2 pb-4">
+          <h1>Жанр</h1>
+          <MDBInput
+            v-model="genreName"
+            type="text"
+            placeholder="Название"
+            class="normal-input"
           />
-        </li>
-      </ul>
-      <label v-if="creationsUnapproved.length == 0" class="m-4"
-        >Здесь ничего нет</label
-      >
-    </div>
-    <div class="row-span-3 row-start-2 col-span-1 col-start-2 pt-4 pl-4">
-      <h2>Неодобренные авторы</h2>
-      <ul
-        class="divide-y divide-gray-300 overflow-auto h-full"
-        v-if="authorsUnapproved.length != 0"
-      >
-        <li
-          v-for="author in authorsUnapproved"
-          :key="author.id"
-          class="hover:bg-gray-100"
-        >
-          <mini-author-info v-bind="$attrs"
-            :author_id="author.id"
-            :img_height="80"
-            :img_width="80"
+          <MDBInput
+            v-model="genreDescription"
+            type="text"
+            placeholder="Описание"
+            class="normal-input"
           />
-        </li>
-      </ul>
-      <label v-if="authorsUnapproved.length == 0" class="m-4"
-        >Здесь ничего нет</label
+          <MDBBtn @click="addGenreRequest()">Добавить</MDBBtn>
+        </div>
+        <div class="col-span-1 col-start-2 flex flex-col p-2 pb-4">
+          <h1>Тэг</h1>
+          <MDBInput
+            v-model="tagName"
+            type="text"
+            placeholder="Название"
+            class="normal-input"
+          />
+          <MDBInput
+            v-model="tagDescription"
+            type="text"
+            placeholder="Описание"
+            class="normal-input"
+          />
+          <MDBBtn @click="addTagRequest()">Добавить</MDBBtn>
+        </div>
+        <div class="col-span-1 col-start-3 flex flex-col p-2 pb-4">
+          <h1>Роль</h1>
+          <MDBInput
+            v-model="roleName"
+            type="text"
+            placeholder="Название"
+            class="normal-input"
+          />
+          <MDBInput
+            v-model="roleDescription"
+            type="text"
+            placeholder="Описание"
+            class="normal-input"
+          />
+          <MDBBtn @click="addRoleRequest()">Добавить</MDBBtn>
+        </div>
+      </div>
+      <div
+        class="
+          row-span-3 row-start-2
+          col-span-1 col-start-1
+          flex flex-col
+          align-items-center
+          p-4
+        "
       >
+        <h2>Ожидающие одобрения произведения</h2>
+        <ul
+          class="divide-y divide-gray-300 overflow-auto h-full w-full"
+          v-if="creationsUnapproved.length != 0"
+        >
+          <li
+            v-for="creation in creationsUnapproved"
+            :key="creation.id"
+            class="hover:bg-gray-100"
+          >
+            <mini-creation-info
+              :creation_id="creation.id"
+              :img_height="80"
+              :img_width="80"
+              :isApproved="false"
+            />
+          </li>
+        </ul>
+        <label v-if="creationsUnapproved.length == 0" class="m-4"
+          >Здесь ничего нет</label
+        >
+      </div>
+      <div
+        class="
+          row-span-3 row-start-2
+          col-span-1 col-start-2
+          flex flex-col
+          align-items-center
+          p-4
+        "
+      >
+        <h2>Ожидающие одобрения участники</h2>
+        <ul
+          class="divide-y divide-gray-300 overflow-auto h-full w-full"
+          v-if="authorsUnapproved.length != 0"
+        >
+          <li
+            v-for="author in authorsUnapproved"
+            :key="author.id"
+            class="hover:bg-gray-100"
+          >
+            <mini-author-info
+              v-bind:author_id="author.id"
+              v-bind:img_height="80"
+              v-bind:img_width="80"
+            />
+          </li>
+        </ul>
+        <label v-if="authorsUnapproved.length == 0" class="m-4"
+          >Здесь ничего нет</label
+        >
+      </div>
     </div>
   </div>
 </template>
@@ -107,19 +128,18 @@ import { APIURL } from "../constants";
 import CustomHeader from "../components/CustomHeader";
 import MiniCreationInfo from "../components/MiniCreationInfo";
 import MiniAuthorInfo from "../components/MiniAuthorInfo";
+import { MDBBtn, MDBInput } from "mdb-vue-ui-kit";
 
 export default {
   components: {
     "custom-header": CustomHeader,
-    "mini-creation-info": MiniAuthorInfo,
-    "mini-author-info": MiniCreationInfo,
+    "mini-creation-info": MiniCreationInfo,
+    "mini-author-info": MiniAuthorInfo,
+    MDBBtn,
+    MDBInput,
   },
   data() {
     return {
-      showGenre: false,
-      showTag: false,
-      showRole: false,
-      choosenPage: "Выберите действие",
       genreName: "",
       genreDescription: "",
       tagName: "",
@@ -133,41 +153,25 @@ export default {
     };
   },
   async created() {
-    //this.fetchUnapprovedCreations();
-    //this.fetchUnapprovedAuthors();
+    this.fetchUnapprovedCreations();
+    this.fetchUnapprovedAuthors();
   },
   methods: {
-    changePage() {
-      switch (this.choosenPage) {
-        case "Выберите действие":
-          this.showGenre = false;
-          this.showTag = false;
-          this.showRole = false;
-          break;
-        case "Добавить жанр":
-          this.showGenre = true;
-          this.showTag = false;
-          this.showRole = false;
-          break;
-        case "Добавить тэг":
-          this.showGenre = false;
-          this.showTag = true;
-          this.showRole = false;
-          break;
-        case "Добавить роль":
-          this.showGenre = false;
-          this.showTag = false;
-          this.showRole = true;
-          break;
-      }
-    },
     addGenreRequest() {
       if (this.genreName == "") {
-        alert("Не заполнено название жанра");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено название жанра",
+          type: "error",
+        });
         return;
       }
       if (this.genreDescription == "") {
-        alert("Не заполнено описание жанра");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено описание жанра",
+          type: "error",
+        });
         return;
       }
       const token = localStorage.getItem("token");
@@ -181,17 +185,38 @@ export default {
             },
           }
         )
+        .then(() => {
+          this.$notify({
+            title: "Успех",
+            text: "Жанр добавлен",
+            type: "sucess",
+          });
+          this.genreName = "";
+          this.genreDescription = "";
+        })
         .catch((error) => {
-          alert(error.message);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     addTagRequest() {
       if (this.tagName == "") {
-        alert("Не заполнено название тэга");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено название тэга",
+          type: "error",
+        });
         return;
       }
       if (this.tagDescription == "") {
-        alert("Не заполнено описание тэга");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено описание тэга",
+          type: "error",
+        });
         return;
       }
       const token = localStorage.getItem("token");
@@ -205,17 +230,38 @@ export default {
             },
           }
         )
+        .then(() => {
+          this.$notify({
+            title: "Успех",
+            text: "Тэг добавлен",
+            type: "sucess",
+          });
+          this.tagName = "";
+          this.tagDescription = "";
+        })
         .catch((error) => {
-          alert(error.message);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     addRoleRequest() {
       if (this.roleName == "") {
-        alert("Не заполнено название роли");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено название роли",
+          type: "error",
+        });
         return;
       }
       if (this.roleDescription == "") {
-        alert("Не заполнено описание роли");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено описание роли",
+          type: "error",
+        });
         return;
       }
       const token = localStorage.getItem("token");
@@ -229,12 +275,26 @@ export default {
             },
           }
         )
+        .then(() => {
+          this.$notify({
+            title: "Успех",
+            text: "Роль добавлена",
+            type: "sucess",
+          });
+          this.roleName = "";
+          this.roleDescription = "";
+        })
         .catch((error) => {
-          alert(error.message);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchUnapprovedCreations() {
       const token = localStorage.getItem("token");
+      console.log(token);
       this.loadingCreations = true;
       axios
         .get(`${APIURL}/creations-unapproved`, {
@@ -247,7 +307,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchUnapprovedAuthors() {
@@ -264,7 +328,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },

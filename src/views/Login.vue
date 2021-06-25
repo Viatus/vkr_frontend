@@ -3,8 +3,10 @@
     <div
       v-if="alertOpen"
       :class="{
-        'text-white px-6 py-4 border-0 rounded relative mb-4 bg-red-400': isError,
-        'text-white px-6 py-4 border-0 rounded relative mb-4 bg-green-400': !isError,
+        'text-white px-6 py-4 border-0 rounded relative mb-4 bg-red-400':
+          isError,
+        'text-white px-6 py-4 border-0 rounded relative mb-4 bg-green-400':
+          !isError,
       }"
     >
       <span class="text-xl inline-block mr-5 align-middle">
@@ -14,14 +16,35 @@
         {{ alertText }}
       </span>
       <button
-        class="absolute bg-transparent text-2xl font-semibold leading-none right-0 top-0 mt-4 mr-6 outline-none focus:outline-none"
+        class="
+          absolute
+          bg-transparent
+          text-2xl
+          font-semibold
+          leading-none
+          right-0
+          top-0
+          mt-4
+          mr-6
+          outline-none
+          focus:outline-none
+        "
         v-on:click="closeAlert()"
       >
         <span>×</span>
       </button>
     </div>
     <div
-      class="mx-auto max-w-md px-6 py-12 bg-white border-0 shadow-lg sm:rounded-3xl"
+      class="
+        mx-auto
+        max-w-md
+        px-6
+        py-12
+        bg-white
+        border-0
+        shadow-lg
+        sm:rounded-3xl
+      "
     >
       <h1 class="text-2xl font-bold mb-8">Вход</h1>
       <form @submit.prevent="login">
@@ -30,7 +53,21 @@
             v-model="form.email"
             type="text"
             placeholder=" "
-            class="pt-3 pb-2 block w-full px-0 mt-0 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-black border-gray-200"
+            class="
+              pt-3
+              pb-2
+              block
+              w-full
+              px-0
+              mt-0
+              bg-transparent
+              border-0 border-b-2
+              appearance-none
+              focus:outline-none
+              focus:ring-0
+              focus:border-black
+              border-gray-200
+            "
             id="email"
           />
           <label
@@ -47,7 +84,21 @@
             v-model="form.password"
             type="password"
             placeholder=" "
-            class="pt-3 pb-2 block w-full px-0 mt-0 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-black border-gray-200"
+            class="
+              pt-3
+              pb-2
+              block
+              w-full
+              px-0
+              mt-0
+              bg-transparent
+              border-0 border-b-2
+              appearance-none
+              focus:outline-none
+              focus:ring-0
+              focus:border-black
+              border-gray-200
+            "
             id="password"
           />
           <label
@@ -62,7 +113,23 @@
         <button
           id="button"
           type="button"
-          class="w-full px-6 py-3 mt-3 text-lg text-white transition-all duration-150 ease-linear rounded-lg shadow outline-none bg-green-500 hover:bg-green-600 hover:shadow-lg focus:outline-none"
+          class="
+            w-full
+            px-6
+            py-3
+            mt-3
+            text-lg text-white
+            transition-all
+            duration-150
+            ease-linear
+            rounded-lg
+            shadow
+            outline-none
+            bg-green-500
+            hover:bg-green-600
+            hover:shadow-lg
+            focus:outline-none
+          "
           @click="login()"
         >
           Войти
@@ -70,7 +137,23 @@
         <button
           id="button"
           type="button"
-          class="w-full px-6 py-3 mt-3 text-lg text-white transition-all duration-150 ease-linear rounded-lg shadow outline-none bg-green-500 hover:bg-green-600 hover:shadow-lg focus:outline-none"
+          class="
+            w-full
+            px-6
+            py-3
+            mt-3
+            text-lg text-white
+            transition-all
+            duration-150
+            ease-linear
+            rounded-lg
+            shadow
+            outline-none
+            bg-green-500
+            hover:bg-green-600
+            hover:shadow-lg
+            focus:outline-none
+          "
           @click="$router.push('/register')"
         >
           Зарегистрироваться
@@ -115,25 +198,28 @@ export default {
         this.alertOpen = true;
         return;
       }
-      try {
-        const {
-          data: { token, is_admin },
-        } = await axios.post(`${APIURL}/login`, {
+      axios
+        .post(`${APIURL}/login`, {
           email,
           password,
+        })
+        .then((result) => {
+          localStorage.setItem("token", result.data.token);
+          localStorage.setItem("is_admin", result.data.is_admin);
+          localStorage.setItem("email", email);
+
+          this.$router.push("/main-page");
+          this.$notify({
+            title: "Успех",
+            text: "Вход произведен успешно",
+            type: "success",
+          });
+        })
+        .catch((error) => {
+          this.isError = true;
+          this.alertText = error.response.data.error;
+          this.alertOpen = true;
         });
-        localStorage.setItem("token", token);
-        localStorage.setItem("is_admin", is_admin);
-        localStorage.setItem("email", email);
-        this.isError = false;
-        this.alertText = "Вход произведен успешно";
-        this.alertOpen = true;
-        this.$router.push("/main-page");
-      } catch (error) {
-        this.isError = true;
-        this.alertText = "Произошла ошибка при входе";
-        this.alertOpen = true;
-      }
     },
     closeAlert: function () {
       this.alertOpen = false;

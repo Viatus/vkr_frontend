@@ -16,8 +16,8 @@ import AddAuthor from '@/views/AddAuthor';
 import AuthorPage from '@/views/AuthorPage';
 import DiscussionPage from '@/views/DiscussionPage';
 import UnapprovedAuthorPage from '@/views/UnapprovedAuthorPage';
-//import 'bootstrap/scss/bootstrap.scss';
 import 'mdb-vue-ui-kit/css/mdb.min.css';
+import Notifications from '@kyvg/vue3-notification'
 
 /*import axios from 'axios';
 
@@ -79,6 +79,6 @@ const app = createApp(App);
 app.use(VueUniversalModal, {
   teleportTarget: '#modals'
 })
+app.use(Notifications)
 app.use(router);
-//app.use(ElementUI);
 app.mount('#app');

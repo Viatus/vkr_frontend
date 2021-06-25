@@ -38,7 +38,7 @@ import Comment from "../components/Comment";
 export default {
   components: {
     "custom-header": CustomHeader,
-    "comment": Comment,
+    comment: Comment,
   },
   data() {
     return {
@@ -71,7 +71,11 @@ export default {
           this.discussionLoading = false;
         })
         .catch((error) => {
-          alert(`${error.message}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchComments() {
@@ -90,7 +94,11 @@ export default {
           this.commentsLoading = false;
         })
         .catch((error) => {
-          alert(`${error.message}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     prevPage() {
@@ -121,11 +129,19 @@ export default {
             },
           }
         )
-        .then((result) => {
-          alert(result.status);
+        .then(() => {
+          this.$notify({
+            title: "Успех",
+            text: "Комментарий успешно добавлен",
+            type: "success",
+          });
         })
         .catch((error) => {
-          alert(error.message);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },

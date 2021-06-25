@@ -12,10 +12,12 @@
         shadow-xl
         hidden
         lg:block
-        m-6
+        p-2
+        col-sapn-1
+        col-start-1
       "
     />
-    <form class="flex flex-col items-stretch">
+    <form class="flex flex-col items-stretch col-span-2 col-start-2 p-4">
       <MDBInput
         label="Имя автора"
         v-model="form.name"
@@ -39,8 +41,7 @@
         class="pt-4"
       />
       <label> Добавить фотографию: </label>
-      <input
-        type="file"
+      <MDBFile
         accept="image/*"
         @change="previewImage($event)"
         id="file-input"
@@ -56,7 +57,7 @@ import { APIURL } from "../constants";
 import Datepicker from "vue3-datepicker";
 import { ru } from "date-fns/locale";
 import CustomHeader from "../components/CustomHeader";
-import { MDBBtn, MDBInput, MDBTextarea } from "mdb-vue-ui-kit";
+import { MDBBtn, MDBInput, MDBTextarea,MDBFile } from "mdb-vue-ui-kit";
 
 export default {
   components: {
@@ -65,6 +66,7 @@ export default {
     MDBInput,
     MDBBtn,
     MDBTextarea,
+    MDBFile,
   },
   data() {
     return {
@@ -95,16 +97,29 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     sendAuthor() {
       if (this.form.name == "") {
-        alert("Не заполнено имя автора");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено имя автора",
+          type: "error",
+        });
         return;
       }
       if (this.form.description == "") {
-        alert("Не заполнено описание");
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено описание",
+          type: "error",
+        });
+
         return;
       }
       const token = localStorage.getItem("token");
@@ -122,11 +137,19 @@ export default {
         })
         .then((result) => {
           if (result.status == 201) {
-            alert("Добавление прошло успешно");
+            this.$notify({
+              title: "Успех",
+              text: "Запись добавлена",
+              type: "success",
+            });
           }
         })
         .catch((error) => {
-          alert(error.message);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     previewImage(event) {

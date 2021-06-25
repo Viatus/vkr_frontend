@@ -18,12 +18,12 @@
     />
     <div class="min-w-0 relative sm:pr-20 lg:pr-0 xl:pr-20 w-full">
       <h2 class="text-sm font-semibold text-black mb-0.5">
-        {{ creation.Creation_Names?creation.Creation_Names[0].name:"" }}
+        {{ creation.Creation_Names ? creation.Creation_Names[0].name : "" }}
       </h2>
       <dl class="flex flex-wrap text-xs font-medium whitespace-pre w-full">
         <div>
           <dt class="sr-only">Жанр</dt>
-          <dd>{{ creation.genre?creation.genre:""  }}</dd>
+          <dd>{{ creation.genre ? creation.genre : "" }}</dd>
         </div>
         <div
           class="
@@ -114,11 +114,19 @@ export default {
               }
             })
             .catch((error) => {
-              alert(`${error}`);
+              this.$notify({
+                title: "Произошла ошибка",
+                text: error.response.data.error,
+                type: "error",
+              });
             });
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchRating() {
@@ -130,7 +138,11 @@ export default {
           this.rating = result.data.average;
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },

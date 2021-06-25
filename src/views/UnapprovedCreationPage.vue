@@ -2,7 +2,10 @@
   <custom-header />
   <h1>Добавить произведение</h1>
   <div v-if="isLoading">Загрузка</div>
-  <div v-if="!isLoading" class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center">
+  <div
+    v-if="!isLoading"
+    class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center"
+  >
     <img
       v-if="url"
       :src="url"
@@ -13,7 +16,9 @@
         shadow-xl
         hidden
         lg:block
-        m-6
+                p-2
+        col-sapn-1 col-start-1
+
       "
     />
     <form class="flex flex-col items-stretch">
@@ -31,12 +36,7 @@
         type="text"
         class="pt-2"
       />
-      <MDBInput
-        label="Страна"
-        v-model="country"
-        type="text"
-        class="pt-2"
-      />
+      <MDBInput label="Страна" v-model="country" type="text" class="pt-2" />
       <MDBInput
         label="Возрастной рейтниг"
         v-model="ageRating"
@@ -132,12 +132,20 @@ export default {
                 this.isLoading = false;
               })
               .catch((error) => {
-                alert(`${error}`);
+                this.$notify({
+                  title: "Произошла ошибка",
+                  text: error.response.data.error,
+                  type: "error",
+                });
               });
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     approveCreation() {
@@ -163,7 +171,11 @@ export default {
           this.$router.push("/main-page");
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     deleteCreation() {
@@ -180,7 +192,11 @@ export default {
           this.$router.push("/main-page");
         })
         .catch((error) => {
-          alert(error);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },

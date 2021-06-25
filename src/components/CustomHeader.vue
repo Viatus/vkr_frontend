@@ -1,5 +1,5 @@
 <template>
-  <div
+  <!--<div
     class="
       flex flex-row flex-grow
       justify-between
@@ -173,15 +173,118 @@
         Вход
       </button>
     </div>
-  </div>
+  </div>-->
+  <header>
+    <MDBNavbar expand="lg" light bg="light" container>
+      <!-- Search form -->
+      <div class="d-flex w-2/6 mr-auto">
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Искать.."
+          aria-label="Search"
+          v-model="form.searchText"
+          @input="searchTextChanged()"
+          @focus="setSearchOptions(true)"
+          @blur="setSearchOptions(false)"
+        />
+        <transition
+          enter-active-class="transition ease-out duration-100"
+          enter-class="transform opacity-0 scale-95"
+          enter-to-class="transform opacity-100 scale-100"
+          leave-active-class="transition ease-in duration-75"
+          leave-class="transform opacity-100 scale-100"
+          leave-to-class="transform opacity-0 scale-95"
+        >
+          <div
+            v-if="searchOptionsShow"
+            class="
+              absolute
+              left-2
+              top-8
+              mt-6
+              w-2/6
+              rounded-md
+              shadow-lg
+              text-sm
+              overflow-hidden
+              border
+              z-20
+              bg-white
+            "
+          >
+            <ul
+              v-if="optionsCreations.length != 0"
+              class="divide-y divide-gray-300 overflow-auto h-full p-0 m-0"
+            >
+              <li
+                v-for="creation in optionsCreations"
+                :key="creation.id"
+                class="hover:bg-gray-100"
+              >
+                <mini-creation-info
+                  :creation_id="creation.id"
+                  :img_height="30"
+                  :img_width="30"
+                  :isApproved="true"
+                />
+              </li>
+            </ul>
+            <label v-if="optionsCreations.length == 0">
+              Ничего не найдено
+            </label>
+          </div>
+        </transition>
+      </div>
+      <MDBNavbarNav class="mb-2 mb-lg-0 m-0 ms-auto">
+        <MDBNavbarItem to="/search" active> Расширенный поиск </MDBNavbarItem>
+        <MDBNavbarItem to="/add-creation" active>
+          Добавить произведение
+        </MDBNavbarItem>
+        <MDBDropdown v-if="email" class="nav-item" v-model="profileShown">
+          <MDBDropdownToggle
+            tag="a"
+            class="nav-link text-dark"
+            @click="profileShown = !profileShown"
+            >{{ email }}</MDBDropdownToggle
+          >
+          <MDBDropdownMenu aria-labelledby="dropdownMenuButton">
+            <MDBDropdownItem v-if="isAdmin" to="/admin-page"
+              >Панель управление</MDBDropdownItem
+            >
+            <MDBDropdownItem to="/main-page">Профиль</MDBDropdownItem>
+            <MDBDropdownItem divider />
+            <MDBDropdownItem @click="logout()" href="#">Выйти</MDBDropdownItem>
+          </MDBDropdownMenu>
+        </MDBDropdown>
+        <MDBNavbarItem v-if="!email" to="/login" active>Войти</MDBNavbarItem>
+      </MDBNavbarNav>
+    </MDBNavbar>
+  </header>
 </template>
 <script>
 import axios from "axios";
 import { APIURL } from "../constants";
 import MiniCreationInfo from "./MiniCreationInfo.vue";
+import {
+  MDBNavbar,
+  MDBNavbarNav,
+  MDBNavbarItem,
+  MDBDropdown,
+  MDBDropdownToggle,
+  MDBDropdownMenu,
+  MDBDropdownItem,
+} from "mdb-vue-ui-kit";
 export default {
   components: {
     "mini-creation-info": MiniCreationInfo,
+    MDBNavbar,
+    MDBNavbarNav,
+    MDBNavbarItem,
+    MDBDropdown,
+    MDBDropdownToggle,
+    MDBDropdownMenu,
+    MDBDropdownItem,
   },
   data() {
     return {
@@ -202,7 +305,7 @@ export default {
   created() {
     if (localStorage.getItem("token")) {
       this.isLoggedIn = true;
-      if (localStorage.getItem("is_admin")) {
+      if (localStorage.getItem("is_admin") == true) {
         this.isAdmin = true;
       }
       this.email = localStorage.getItem("email");
@@ -229,7 +332,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchGenres() {
@@ -243,7 +350,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     fetchTags() {
@@ -257,7 +368,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     searchTextChanged() {
@@ -277,7 +392,11 @@ export default {
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
     setSearchOptions(flag) {

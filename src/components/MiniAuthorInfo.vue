@@ -20,6 +20,15 @@
       <h2 class="text-sm font-semibold text-black mb-0.5">
         {{ author ? author.name : "" }}
       </h2>
+      <dl
+        v-if="role"
+        class="flex flex-wrap text-xs font-medium whitespace-pre w-full"
+      >
+        <div>
+          <dt class="sr-only">Роль</dt>
+          <dd>{{ role }}</dd>
+        </div>
+      </dl>
     </div>
   </router-link>
 </template>
@@ -32,6 +41,7 @@ export default {
     author_id: Number,
     img_height: Number,
     img_width: Number,
+    role: String,
   },
   data() {
     return {
@@ -45,6 +55,7 @@ export default {
   },
   methods: {
     fetchAuthorInfo() {
+      this.isLoading = true;
       const fetchedId = this.$route.params.id;
       axios
         .get(`${APIURL}/authors/${this.author_id}`)
@@ -55,10 +66,15 @@ export default {
             if (this.author.image !== undefined) {
               this.image = "data:image/jpg;base64," + this.author.image;
             }
+            this.isLoading = false;
           }
         })
         .catch((error) => {
-          alert(`${error}`);
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
         });
     },
   },
