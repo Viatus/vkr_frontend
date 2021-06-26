@@ -55,7 +55,7 @@
       <div class="row-span-1 row-start-1 col-span-1 col-start-1 flex flex-col
         align-items-center
         p-4">
-        <h2>Рекоммендации</h2>
+        <h2>Рекомендации</h2>
         <ul
           class="divide-y divide-gray-300 overflow-auto h-full w-full"
           v-if="recommendedCreations.length != 0"
@@ -70,6 +70,7 @@
               :img_height="80"
               :img_width="80"
               :isApproved="true"
+              :predictedRating="creation.predicted_rating"
             />
           </li>
         </ul>

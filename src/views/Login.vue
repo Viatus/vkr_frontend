@@ -205,10 +205,14 @@ export default {
         })
         .then((result) => {
           localStorage.setItem("token", result.data.token);
-          localStorage.setItem("is_admin", result.data.is_admin);
+          if (result.data.is_admin == true) {
+            localStorage.setItem("is_admin", "true");
+          } else {
+            localStorage.setItem("is_admin", "false");
+          }
           localStorage.setItem("email", email);
 
-          this.$router.push("/main-page");
+          this.$router.push("/profile");
           this.$notify({
             title: "Успех",
             text: "Вход произведен успешно",

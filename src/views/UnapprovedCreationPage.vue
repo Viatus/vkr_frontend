@@ -168,7 +168,7 @@ export default {
           headers: { authorization: token },
         })
         .then(() => {
-          this.$router.push("/main-page");
+          this.$router.push("/profile");
         })
         .catch((error) => {
           this.$notify({
@@ -189,7 +189,7 @@ export default {
           { headers: { authorization: token } }
         )
         .then(() => {
-          this.$router.push("/main-page");
+          this.$router.push("/profile");
         })
         .catch((error) => {
           this.$notify({

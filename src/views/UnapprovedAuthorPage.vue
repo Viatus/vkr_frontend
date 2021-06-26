@@ -1,6 +1,6 @@
 <template>
   <custom-header />
-  <h1>Одобрить автора</h1>
+  <h1>Одобрить участника</h1>
   <div v-if="isLoading">Загрузка</div>
   <div class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center">
     <img
@@ -19,7 +19,7 @@
     <form class="flex flex-col items-stretch">
       <MDBInput
         disabled
-        label="Имя автора"
+        label="Имя участника"
         v-model="info.name"
         type="text"
         class="pt-2"
@@ -128,7 +128,7 @@ export default {
           headers: { authorization: token },
         })
         .then(() => {
-          this.$router.push("/main-page");
+          this.$router.push("/profile");
         })
         .catch((error) => {
           this.$notify({
@@ -149,7 +149,7 @@ export default {
           { headers: { authorization: token } }
         )
         .then(() => {
-          this.$router.push("/main-page");
+          this.$router.push("/profile");
         })
         .catch((error) => {
           this.$notify({

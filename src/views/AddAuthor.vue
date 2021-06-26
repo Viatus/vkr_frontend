@@ -1,6 +1,6 @@
 <template>
   <custom-header />
-  <h1>Добавить автора</h1>
+  <h1>Добавить участника</h1>
   <div class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center">
     <img
       v-if="url"
@@ -19,7 +19,7 @@
     />
     <form class="flex flex-col items-stretch col-span-2 col-start-2 p-4">
       <MDBInput
-        label="Имя автора"
+        label="Имя участника"
         v-model="form.name"
         type="text"
         class="pt-2"
@@ -108,7 +108,7 @@ export default {
       if (this.form.name == "") {
         this.$notify({
           title: "Ошибка при вводе",
-          text: "Не заполнено имя автора",
+          text: "Не заполнено имя участника",
           type: "error",
         });
         return;

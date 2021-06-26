@@ -53,9 +53,11 @@
           </dt>
           <dd>
             {{
+              predictedRating == null?
               creation.rating == null
                 ? 0
                 : Math.round((creation.rating + Number.EPSILON) * 100) / 100
+                : predictedRating
             }}
           </dd>
         </div>
@@ -73,6 +75,7 @@ export default {
     img_height: Number,
     img_width: Number,
     isApproved: Boolean,
+    predictedRating: Number,
   },
   data() {
     return {

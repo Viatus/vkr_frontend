@@ -50,11 +50,6 @@
             День рождения: {{ info.birthday.slice(0, 10) }}
           </h1>
         </div>
-        <div v-if="info.birthday !== undefined">
-          <h1 id="description" class="text-base">
-            День рождения: {{ info.birthday.slice(0, 10) }}
-          </h1>
-        </div>
       </div>
     </div>
     <div class="h-80 col-start-1 col-span-4">
@@ -70,8 +65,6 @@
         </li>
       </ul>
     </div>
-    <button v-if="isAdmin" @Click="deleteCreation">Удалить</button>
-    <button @Click="$router.go(-1)">Назад</button>
   </div>
 </template>
 <script>

@@ -137,8 +137,9 @@
             origin-bottom-left
             absolute
             left-0
+            bottom-8
             mt-2
-            w-1/6
+            w-5/6
             rounded-md
             shadow-lg
             text-sm
@@ -146,11 +147,12 @@
             border
             z-20
             bg-white
+            p-0
           "
         >
           <ul
             v-if="realtionModalCreations.length != 0"
-            class="divide-y divide-gray-300 overflow-auto h-full"
+            class="divide-y divide-gray-300 overflow-auto h-full w-full p-0"
           >
             <li
               v-for="creation in realtionModalCreations"
@@ -189,13 +191,15 @@
     v-model="showAddAuthorModal"
   >
     <MDBModalHeader>
-      <MDBModalTitle id="addAuthorModalLabel"> Добавить автора </MDBModalTitle>
+      <MDBModalTitle id="addAuthorModalLabel">
+        Добавить участника
+      </MDBModalTitle>
     </MDBModalHeader>
     <MDBModalBody>
       <input
         type="text"
         v-model="authorModalTextSearch"
-        placeholder="Имя автора"
+        placeholder="Имя участника"
         @input="authorSearchTextChanged()"
         @focus="setAuthorSearchOptions(true)"
         @blur="setAuthorSearchOptions(false)"
@@ -217,11 +221,12 @@
         <div
           v-if="authorSearchOptionsShow"
           class="
-            origin-top-left
+            origin-bottom-left
             absolute
             left-0
+            bottom-2
             mt-2
-            w-1/6
+            w-5/6
             rounded-md
             shadow-lg
             text-sm
@@ -229,6 +234,7 @@
             border
             z-20
             bg-white
+            p-0
           "
         >
           <ul
@@ -289,6 +295,93 @@
     </MDBModalFooter>
   </MDBModal>
 
+  <MDBModal
+    id="newRecModal"
+    tabindex="-1"
+    labelledby="newRecLabel"
+    class="w-100"
+    v-model="showNewRecModal"
+  >
+    <MDBModalHeader>
+      <MDBModalTitle id="newRecLabel"> Добавить рекомендацию </MDBModalTitle>
+    </MDBModalHeader>
+    <MDBModalBody>
+      <div class="flex flex-col">
+        <input
+          type="text"
+          v-model="relationModalTextSearch"
+          placeholder="Название рекомендуемого произведения"
+          @input="searchTextChanged()"
+          @focus="setSearchOptions(true)"
+          @blur="setSearchOptions(false)"
+        />
+        <input
+          placeholder="Причина рекомендации"
+          v-model="userRecContent"
+          type="text"
+        />
+      </div>
+      <transition
+        enter-active-class="transition ease-out duration-100"
+        enter-class="transform opacity-0 scale-95"
+        enter-to-class="transform opacity-100 scale-100"
+        leave-active-class="transition ease-in duration-75"
+        leave-class="transform opacity-100 scale-100"
+        leave-to-class="transform opacity-0 scale-95"
+      >
+        <div
+          v-if="searchOptionsShow"
+          class="
+            origin-bottom-left
+            absolute
+            left-0
+            bottom-2
+            mt-2
+            w-5/6
+            rounded-md
+            shadow-lg
+            text-sm
+            overflow-hidden
+            border
+            z-20
+            bg-white
+            p-0
+          "
+        >
+          <ul
+            v-if="realtionModalCreations.length != 0"
+            class="divide-y divide-gray-300 overflow-auto h-full w-full p-0"
+          >
+            <li
+              v-for="creation in realtionModalCreations"
+              :key="creation.id"
+              class="hover:bg-gray-100"
+            >
+              <button
+                v-if="creation.id != $route.params.id"
+                @click="
+                  userRecSecondCreationId = creation.id;
+                  relationModalTextSearch = creation.Creation_Names[0].name;
+                "
+              >
+                {{ creation.Creation_Names[0].name }}
+              </button>
+            </li>
+          </ul>
+          <label v-if="realtionModalCreations.length == 0">
+            Ничего не найдено
+          </label>
+        </div>
+      </transition>
+    </MDBModalBody>
+    <MDBModalFooter>
+      <MDBBtn color="secondary" @click="showNewRecModal = false"
+        >Закрыть</MDBBtn
+      >
+      <MDBBtn color="primary" @click="addNewRec()">Отправить</MDBBtn>
+    </MDBModalFooter>
+  </MDBModal>
+
   <div class="min-h-screen">
     <custom-header />
     <div v-if="loading">
@@ -338,6 +431,7 @@
           :read-only="true"
           @click="showReviewModal = true"
         />
+        <h1 class="text-base pt-16">Персонализированный рейтинг: 8 </h1>
         <h1 v-if="info.country" id="country" class="text-base pt-16">
           Страна: {{ info.country }}
         </h1>
@@ -358,34 +452,9 @@
             {{ info.description }}
           </h1>
         </div>
-        <div v-if="info.Creation_Names.length > 1">
+        <div v-if="tags.length > 1">
           Тэги:
           {{ tags.map((a) => a.name).join() }}
-        </div>
-        <div class="pt-2">
-          <div class="flex flex-row h-6">
-            Авторы
-            <MDBBtn
-              tag="a"
-              color="light"
-              rounded
-              @click="
-                showAddAuthorModal = true;
-                fetchRoles();
-              "
-              size="sm"
-            >
-              <MDBIcon iconStyle="fas" icon="plus"></MDBIcon>
-            </MDBBtn>
-          </div>
-          <ul v-if="involvment !== null" class="pl-4">
-            <li v-for="inv in involvment" :key="inv.id">
-              <router-link :to="{ path: `/authors/${inv.Authors[0].id}` }">
-                {{ inv.name }} : {{ inv.Authors[0].name }}
-              </router-link>
-            </li>
-          </ul>
-          <label v-if="involvment === null" class="pl-4">Никто не указан</label>
         </div>
         <div class="pt-2">
           <div class="flex flex-row h-6">
@@ -438,27 +507,59 @@
       <div
         class="pl-12 col-span-1 col-start-5 row-span-4 flex-col align-middle"
       >
-        <h2>Участники</h2>
-        <ul class="divide-y divide-gray-300 overflow-auto h-full">
-          <li
-            v-for="inv in involvement"
-            :key="inv.id"
-            class="hover:bg-gray-100"
+        <div class="flex flex-row">
+          <h2>Участники</h2>
+          <MDBBtn
+            tag="a"
+            color="light"
+            rounded
+            @click="
+              showAddAuthorModal = true;
+              fetchRoles();
+            "
+            size="sm"
+            class="m-2"
           >
-            <mini-author-info
-              :author_id="inv.id"
-              :img_height="80"
-              :img_width="80"
-              :role="inv.name"
-            />
+            <MDBIcon iconStyle="fas" icon="plus"></MDBIcon>
+          </MDBBtn>
+        </div>
+        <ul
+          v-if="involvment"
+          class="divide-y divide-gray-300 overflow-auto h-full pr-4"
+        >
+          <li v-for="inv in involvment" :key="inv.id">
+            <ul
+              v-if="involvment"
+              class="divide-y divide-gray-300 overflow-auto h-full pr-4"
+            >
+              <li
+                v-for="author in inv.Authors"
+                :key="author.id"
+                class="hover:bg-gray-100"
+              >
+                <mini-author-info
+                  :author_id="author.id"
+                  :img_height="80"
+                  :img_width="80"
+                  :role="inv.name"
+                  :isApproved="true"
+                />
+              </li>
+            </ul>
           </li>
         </ul>
+        <label v-if="involvment === null" class="pl-4">Никто не указан</label>
       </div>
     </div>
-    <div class="grid grid-cols-2 grid-rows-1">
-      <div class="h-80 col-start-1 col-span-1">
+    <div class="grid grid-cols-3 grid-rows-1">
+      <div
+        class="h-80 col-start-1 col-span-1 flex flex-col align-items-center p-4"
+      >
         <h2>Похожие на основе тэгов</h2>
-        <ul class="divide-y divide-gray-300 overflow-auto h-full">
+        <ul
+          v-if="similar.length > 0"
+          class="divide-y divide-gray-300 overflow-auto h-full w-full"
+        >
           <li
             v-for="creation in similar"
             :key="creation.id"
@@ -472,10 +573,18 @@
             />
           </li>
         </ul>
+        <label v-if="similar.length == 0" class="pl-4"
+          >Такие произведения не найдены</label
+        >
       </div>
-      <div class="h-80 col-start-2 col-span-1">
-        <h2>Похожие на основе авторов</h2>
-        <ul class="divide-y divide-gray-300 overflow-auto h-full">
+      <div
+        class="h-80 col-start-2 col-span-1 flex flex-col align-items-center p-4"
+      >
+        <h2>Похожие на основе участников</h2>
+        <ul
+          v-if="similarByAuthor.length > 0"
+          class="divide-y divide-gray-300 overflow-auto h-full w-full"
+        >
           <li
             v-for="creation in similarByAuthor"
             :key="creation.id"
@@ -489,34 +598,112 @@
             />
           </li>
         </ul>
+        <label v-if="similarByAuthor.length == 0" class="pl-4"
+          >Такие произведения не найдены</label
+        >
+      </div>
+      <div
+        class="h-80 col-start-3 col-span-1 flex flex-col align-items-center p-4"
+      >
+        <div class="flex flex-row">
+          <h2>Пользовательские рекомендации</h2>
+          <MDBBtn
+            tag="a"
+            color="light"
+            rounded
+            @click="showNewRecModal = true"
+            size="sm"
+            class="mb-2 ms-2 mt-2"
+          >
+            <MDBIcon iconStyle="fas" icon="plus"></MDBIcon>
+          </MDBBtn>
+        </div>
+        <ul
+          v-if="userRecs.length > 0"
+          class="divide-y divide-gray-300 overflow-auto h-full w-full"
+        >
+          <li
+            v-for="userRec in userRecs"
+            :key="userRec.id"
+            class="hover:bg-gray-100"
+          >
+            <mini-creation-info
+              :creation_id="
+                userRec.firstCreationId == $route.params.id
+                  ? userRec.secondCreationId
+                  : userRec.firstCreationId
+              "
+              :img_height="80"
+              :img_width="80"
+              :isApproved="true"
+            />
+          </li>
+        </ul>
+        <label v-if="userRecs.length == 0" class="pl-4"
+          >Такие произведения не найдены</label
+        >
       </div>
     </div>
-    <div>
-      <h2>Обсуждения</h2>
-      <ul class="divide-y divide-gray-300 overflow-auto h-full">
-        <li
-          v-for="discussion in discussions"
-          :key="discussion.id"
-          class="hover:bg-gray-100 border-2 border-gray-400"
+    <div class="grid grid-cols-2 grid-rows-1">
+      <div
+        class="h-80 col-start-1 col-span-1 flex flex-col align-items-center p-4"
+      >
+        <h2>Обсуждения</h2>
+        <ul
+          v-if="discussions.length > 0"
+          class="divide-y divide-gray-300 overflow-auto h-full"
         >
-          <router-link :to="{ path: `/discussion-page/${discussion.id}` }">
-            <h1>{{ discussion.title }}</h1>
-            <div
-              class="
-                mx-auto
-                lg:mx-0
-                w-100
-                border-b-2 border-gray-400
-                opacity-25
-              "
-            ></div>
-            <h2>{{ discussion.content }}</h2>
-          </router-link>
-        </li>
-      </ul>
+          <li
+            v-for="discussion in discussions"
+            :key="discussion.id"
+            class="hover:bg-gray-100 border-2 border-gray-400"
+          >
+            <router-link :to="{ path: `/discussion-page/${discussion.id}` }">
+              <h1 class="text-black">{{ discussion.title }}</h1>
+              <div
+                class="
+                  mx-auto
+                  lg:mx-0
+                  w-100
+                  border-b-2 border-gray-400
+                  opacity-25
+                "
+              ></div>
+              <h2 class="text-black">{{ discussion.content }}</h2>
+            </router-link>
+          </li>
+        </ul>
+        <label v-if="discussions.length == 0" class="pl-4"
+          >Обсуждений нет</label
+        >
+      </div>
+      <div
+        class="h-80 col-start-2 col-span-1 flex flex-col align-items-center p-4"
+      >
+        <h2>Отзывы</h2>
+        <ul
+          v-if="reviews.length != 0"
+          class="divide-y divide-gray-300 overflow-auto h-full w-full"
+        >
+          <li
+            v-for="review in reviews"
+            :key="review.id"
+            class="hover:bg-gray-100 border-2 border-gray-400"
+          >
+            <review-block :review_id="review.id" :isOnUserPage="false" />
+          </li>
+        </ul>
+        <label v-if="reviews.length == 0" class="pl-4"
+          >Детальных отзывов нет</label
+        >
+      </div>
     </div>
-    <button v-if="isAdmin" @Click="deleteCreation">Удалить произведение</button>
-    <button @Click="showNewDiscussionModal = true">Добавить обсуждение</button>
+    <MDBBtn color="light" v-if="isAdmin" @Click="deleteCreation"
+      >Удалить произведение</MDBBtn
+    >
+    <MDBBtn color="light" @Click="showNewDiscussionModal = true"
+      >Добавить обсуждение</MDBBtn
+    >
   </div>
 </template>
 <script>
@@ -526,6 +713,7 @@ import CustomHeader from "../components/CustomHeader";
 import StarRating from "vue-star-rating";
 import MiniCreationInfo from "../components/MiniCreationInfo";
 import MiniAuthorInfo from "../components/MiniAuthorInfo";
+import Review from "../components/Review.vue";
 import {
   MDBModal,
   MDBModalHeader,
@@ -541,6 +729,7 @@ export default {
     "custom-header": CustomHeader,
     "mini-creation-info": MiniCreationInfo,
     "mini-author-info": MiniAuthorInfo,
+    "review-block": Review,
     StarRating,
     MDBModal,
     MDBModalHeader,
@@ -585,6 +774,11 @@ export default {
       showNewNameModal: false,
       newName: "",
       discussions: [],
+      reviews: [],
+      userRecs: [],
+      showNewRecModal: false,
+      userRecSecondCreationId: null,
+      userRecContent: "",
     };
   },
   async created() {
@@ -596,7 +790,11 @@ export default {
     this.fetchSimilarByAuthors();
     this.fetchRelatedCreations();
     this.fetchDiscussions();
-    this.isAdmin = localStorage.getItem("isAdmin");
+    this.fetchReviews();
+    this.fetchUserRecs();
+    if (localStorage.getItem("is_admin") == "true") {
+      this.isAdmin = true;
+    }
   },
   methods: {
     fetchCreationInfo() {
@@ -645,9 +843,7 @@ export default {
     fetchSimilar() {
       const fetchedId = this.$route.params.id;
       axios
-        .get(`${APIURL}/creations-similar`, {
-          headers: { creation_id: fetchedId },
-        })
+        .get(`${APIURL}/creations-similar/${this.$route.params.id}`, )
         .then((result) => {
           if (this.$route.params.id !== fetchedId) return;
           if (result.data.result !== undefined) {
@@ -762,7 +958,6 @@ export default {
           if (this.$route.params.id !== fetchedId) return;
           this.fetchRating();
           this.showReviewModal = false;
-          //Оповестить пользователя что все классно
         })
         .catch((error) => {
           this.$notify({
@@ -973,7 +1168,13 @@ export default {
             },
           }
         )
-        .then(() => {})
+        .then(() => {
+          this.$notify({
+            title: "Успех",
+            text: "Участник добавлен",
+            type: "success",
+          });
+        })
         .catch((error) => {
           this.$notify({
             title: "Произошла ошибка",
@@ -1025,6 +1226,69 @@ export default {
             type: "error",
           });
         });
+    },
+    fetchReviews() {
+      const fetchedId = this.$route.params.id;
+      axios
+        .get(`${APIURL}/reviews-creation/${this.$route.params.id}`)
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          this.reviews = result.data.result;
+        })
+        .catch((error) => {
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
+        });
+    },
+    fetchUserRecs() {
+      const fetchedId = this.$route.params.id;
+      axios
+        .get(`${APIURL}/user-reccomendations/${this.$route.params.id}`)
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          this.userRecs = result.data.result;
+        })
+        .catch((error) => {
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
+        });
+    },
+    addNewRec() {
+      if (this.userRecSecondCreationId === null) {
+        alert("Не указано рекомендуемое произведение");
+        return;
+      }
+      const fetchedId = this.$route.params.id;
+      const token = localStorage.getItem("token");
+      axios
+        .post(
+          `${APIURL}/user-reccomendations`,
+          {
+            firstCreationId: this.$route.params.id,
+            secondCreationId: this.userRecSecondCreationId,
+            content: this.userRecContent,
+          },
+          { headers: { authorization: token } }
+        )
+        .then(() => {
+          if (this.$route.params.id !== fetchedId) return;
+          this.showNewRecModal = false;
+          //Оповестить пользователя что все классно
+        })
+        .catch((error) => {
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
+        });
+      this.showNewRecModal = false;
     },
   },
 };

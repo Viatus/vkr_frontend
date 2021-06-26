@@ -181,8 +181,7 @@ export default {
       checkedGenres: [],
       sortTypes: [
         { name: "имени", id: 1 },
-        { name: "популярности", id: 2 },
-        { name: "рейтингу", id: 3 },
+        { name: "рейтингу", id: 2 },
       ],
       resultsLoaded: false,
       pageSizes: [10, 20, 50, 100],

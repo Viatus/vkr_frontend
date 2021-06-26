@@ -35,6 +35,16 @@ axios.interceptors.request.use((config) => {
 }, (error) => {
   return Promise.reject(error);
 });*/
+const beforeEnterLogged = (to, from, next) => {
+  const token = localStorage.getItem('token');
+  if (token === null) {
+    next()
+    return true;
+  }
+  next({ path: '/profile' });
+  return false;
+};
+
 const beforeEnter = (to, from, next) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -48,17 +58,17 @@ const beforeEnter = (to, from, next) => {
 const beforeEnterAdmin = (to, from, next) => {
   const token = localStorage.getItem('token');
   const isAdmin = localStorage.getItem('is_admin');
-  if (token && isAdmin) {
+  if (token && isAdmin == "true") {
     next()
     return true;
   }
-  //next(false);
+  next({ path: '/profile' });
   return false;
 };
 
 const routes = [
-  { path: '/login', component: Login },
-  { path: '/register', component: Register },
+  { path: '/login', beforeEnterLogged, component: Login },
+  { path: '/register', beforeEnterLogged, component: Register },
   { path: '/add-creation', beforeEnter, component: AddCreation },
   { path: '/add-author', beforeEnter, component: AddAuthor },
   { path: '/creations/:id', component: CreationPage },
@@ -66,9 +76,17 @@ const routes = [
   { path: '/unapproved-creations/:id', beforeEnterAdmin, component: UnapprovedCreationPage },
   { path: '/admin-page', beforeEnterAdmin, component: AdminPage },
   { path: '/search', component: SearchPage },
-  { path: '/main-page', component: MainPage },
+  { path: '/profile', component: MainPage },
   { path: '/discussion-page/:id', component: DiscussionPage },
   { path: '/unapproved-authors/:id', beforeEnterAdmin, component: UnapprovedAuthorPage },
+  {
+    path: '/', redirect: () => {
+      if (localStorage.getItem('token') !== null) {
+        return '/profile';
+      }
+      return '/login';
+    }
+  }
 ];
 const router = createRouter({
   history: createWebHistory(),

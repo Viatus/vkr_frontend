@@ -42,6 +42,7 @@ export default {
     img_height: Number,
     img_width: Number,
     role: String,
+    isApproved: Boolean
   },
   data() {
     return {

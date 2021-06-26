@@ -252,7 +252,7 @@
             <MDBDropdownItem v-if="isAdmin" to="/admin-page"
               >Панель управление</MDBDropdownItem
             >
-            <MDBDropdownItem to="/main-page">Профиль</MDBDropdownItem>
+            <MDBDropdownItem to="/profile">Профиль</MDBDropdownItem>
             <MDBDropdownItem divider />
             <MDBDropdownItem @click="logout()" href="#">Выйти</MDBDropdownItem>
           </MDBDropdownMenu>
@@ -305,7 +305,7 @@ export default {
   created() {
     if (localStorage.getItem("token")) {
       this.isLoggedIn = true;
-      if (localStorage.getItem("is_admin") == true) {
+      if (localStorage.getItem("is_admin") == "true") {
         this.isAdmin = true;
       }
       this.email = localStorage.getItem("email");
