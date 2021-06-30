@@ -1,4 +1,81 @@
 <template>
+  <MDBModal
+    id="addAuthorModal"
+    tabindex="-1"
+    labelledby="addAuthorModalLabel"
+    class="w-100"
+    v-model="showAddAuthorModal"
+  >
+    <MDBModalHeader>
+      <MDBModalTitle id="addAuthorModalLabel">
+        Добавить участника
+      </MDBModalTitle>
+    </MDBModalHeader>
+    <MDBModalBody>
+      <div class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center">
+        <img
+          v-if="urlAuthor"
+          :src="urlAuthor"
+          class="
+            row-span-1
+            rounded-none
+            lg:rounded-lg
+            shadow-xl
+            hidden
+            lg:block
+            p-2
+            col-sapn-1 col-start-1
+          "
+        />
+        <form class="flex flex-col items-stretch col-span-2 col-start-2 p-4">
+          <MDBInput
+            label="Имя участника"
+            v-model="authorForm.name"
+            type="text"
+            class="pt-2"
+          />
+          <MDBInput
+            label="Страна"
+            v-model="authorForm.country"
+            type="text"
+            class="pt-2"
+          />
+          <div class="flex flex-row pt-2">
+            <label class="pr-4">День рождения</label>
+            <datepicker
+              v-model="authorForm.date"
+              :locale="locale"
+              class="border"
+            />
+          </div>
+          <MDBTextarea
+            v-model="authorForm.description"
+            label="Описание"
+            rows="4"
+            class="pt-4"
+          />
+          <label> Добавить фотографию: </label>
+          <MDBFile
+            accept="image/*"
+            @change="previewImageAuthor($event)"
+            id="file-input-author"
+          />
+        </form>
+      </div>
+    </MDBModalBody>
+    <MDBModalFooter>
+      <MDBBtn
+        color="secondary"
+        @click="
+          showAddAuthorModal = false;
+          fetchAuthors();
+        "
+        >Закрыть</MDBBtn
+      >
+      <MDBBtn color="primary" @click="sendAuthor();fetchAuthors();">Отправить</MDBBtn>
+    </MDBModalFooter>
+  </MDBModal>
+
   <custom-header />
   <h1>Добавить произведение</h1>
   <div class="grid grid-cols-3 grid-rows-1 pt-4 w-full justify-center">
@@ -85,7 +162,7 @@
               {{ role.name }}
             </option>
           </select>
-          <router-link to="/add-author" title="Добавить автора">+</router-link>
+          <MDBBtn @click="showAddAuthorModal = true">+</MDBBtn>
         </li>
       </ul>
       <MDBBtn tag="a" color="light" @click="setupNewAuthor()"
@@ -114,7 +191,17 @@ import { APIURL, BOOKAPIURL } from "../constants";
 import Datepicker from "vue3-datepicker";
 import { ru } from "date-fns/locale";
 import CustomHeader from "../components/CustomHeader";
-import { MDBBtn, MDBInput, MDBTextarea, MDBFile } from "mdb-vue-ui-kit";
+import {
+  MDBModal,
+  MDBModalHeader,
+  MDBModalTitle,
+  MDBModalBody,
+  MDBModalFooter,
+  MDBBtn,
+  MDBInput,
+  MDBTextarea,
+  MDBFile,
+} from "mdb-vue-ui-kit";
 
 export default {
   components: {
@@ -124,6 +211,11 @@ export default {
     MDBBtn,
     MDBTextarea,
     MDBFile,
+    MDBModalHeader,
+    MDBModalTitle,
+    MDBModalBody,
+    MDBModalFooter,
+    MDBModal,
   },
   data() {
     return {
@@ -136,6 +228,12 @@ export default {
         ageRating: "",
         choosenAuthors: [],
       },
+      authorForm: {
+        name: "",
+        description: "",
+        country: "",
+        date: null,
+      },
       genres: null,
       tags: null,
       authors: null,
@@ -145,6 +243,9 @@ export default {
       locale: ru,
       image: null,
       isbn: "",
+      imageAuthor: null,
+      urlAuthor: require("@/assets/placeholder.png"),
+      showAddAuthorModal: false,
     };
   },
   async created() {
@@ -193,7 +294,7 @@ export default {
     fetchAuthors() {
       const fetchedId = this.$route.params.id;
       axios
-        .get(`${APIURL}/authors`)
+        .get(`${APIURL}/authors`, { params: { current: false } })
         .then((result) => {
           if (this.$route.params.id !== fetchedId) return;
           if (result.data.result !== undefined) {
@@ -312,7 +413,8 @@ export default {
                   },
                 }
               )
-              .then(() => {})
+              .then(() => {
+              })
               .catch((error) => {
                 this.$notify({
                   title: "Произошла ошибка",
@@ -370,6 +472,58 @@ export default {
             type: "error",
           });
         });
+    },
+    sendAuthor() {
+      if (this.authorForm.name == "") {
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено имя участника",
+          type: "error",
+        });
+        return;
+      }
+      if (this.authorForm.description == "") {
+        this.$notify({
+          title: "Ошибка при вводе",
+          text: "Не заполнено описание",
+          type: "error",
+        });
+
+        return;
+      }
+      const token = localStorage.getItem("token");
+      var bodyFormData = new FormData();
+      bodyFormData.append("cover", this.imageAuthor);
+      bodyFormData.append("name", this.authorForm.name);
+      bodyFormData.append("birthday", this.authorForm.date);
+      bodyFormData.append("description", this.authorForm.description);
+      bodyFormData.append("country", this.authorForm.country);
+      axios
+        .post(`${APIURL}/authors`, bodyFormData, {
+          headers: {
+            authorization: token,
+          },
+        })
+        .then((result) => {
+          if (result.status == 201) {
+            this.$notify({
+              title: "Успех",
+              text: "Запись добавлена",
+              type: "success",
+            });
+          }
+        })
+        .catch((error) => {
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
+        });
+    },
+    previewImageAuthor(event) {
+      this.imageAuthor = event.target.files[0];
+      this.urlAuthor = URL.createObjectURL(this.imageAuthor);
     },
   },
 };

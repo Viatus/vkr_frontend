@@ -1,6 +1,6 @@
 <template>
   <custom-header />
-  <h1>Добавить произведение</h1>
+  <h1>Одобрить произведение</h1>
   <div v-if="isLoading">Загрузка</div>
   <div
     v-if="!isLoading"

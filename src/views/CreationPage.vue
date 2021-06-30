@@ -431,7 +431,10 @@
           :read-only="true"
           @click="showReviewModal = true"
         />
-        <h1 class="text-base pt-16">Персонализированный рейтинг: 8 </h1>
+        <h1 class="text-base pt-16">
+          Персонализированный рейтинг:
+          {{ predictedScore ? predictedScore : "Отсутствует" }}
+        </h1>
         <h1 v-if="info.country" id="country" class="text-base pt-16">
           Страна: {{ info.country }}
         </h1>
@@ -779,6 +782,7 @@ export default {
       showNewRecModal: false,
       userRecSecondCreationId: null,
       userRecContent: "",
+      predictedScore: null,
     };
   },
   async created() {
@@ -792,6 +796,7 @@ export default {
     this.fetchDiscussions();
     this.fetchReviews();
     this.fetchUserRecs();
+    this.fetchPredictedScore();
     if (localStorage.getItem("is_admin") == "true") {
       this.isAdmin = true;
     }
@@ -843,7 +848,7 @@ export default {
     fetchSimilar() {
       const fetchedId = this.$route.params.id;
       axios
-        .get(`${APIURL}/creations-similar/${this.$route.params.id}`, )
+        .get(`${APIURL}/creations-similar/${this.$route.params.id}`)
         .then((result) => {
           if (this.$route.params.id !== fetchedId) return;
           if (result.data.result !== undefined) {
@@ -1153,7 +1158,6 @@ export default {
           roleId = role.id;
         }
       }
-
       axios
         .post(
           `${APIURL}/author-role`,
@@ -1289,6 +1293,25 @@ export default {
           });
         });
       this.showNewRecModal = false;
+    },
+    fetchPredictedScore() {
+      const fetchedId = this.$route.params.id;
+      const token = localStorage.getItem("token");
+      axios
+        .get(`${APIURL}/predict-score/${this.$route.params.id}`, {
+          authorization: token,
+        })
+        .then((result) => {
+          if (this.$route.params.id !== fetchedId) return;
+          this.predictedScore = result.data.result;
+        })
+        .catch((error) => {
+          this.$notify({
+            title: "Произошла ошибка",
+            text: error.response.data.error,
+            type: "error",
+          });
+        });
     },
   },
 };

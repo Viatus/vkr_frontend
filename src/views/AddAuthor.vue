@@ -76,34 +76,12 @@ export default {
         country: "",
         date: null,
       },
-      authors: null,
       url: require("@/assets/placeholder.png"),
       locale: ru,
       image: null,
     };
   },
-  async created() {
-    this.fetchAuthors();
-  },
   methods: {
-    fetchAuthors() {
-      const fetchedId = this.$route.params.id;
-      axios
-        .get(`${APIURL}/authors`)
-        .then((result) => {
-          if (this.$route.params.id !== fetchedId) return;
-          if (result.data.result !== undefined) {
-            this.authors = result.data.result;
-          }
-        })
-        .catch((error) => {
-          this.$notify({
-            title: "Произошла ошибка",
-            text: error.response.data.error,
-            type: "error",
-          });
-        });
-    },
     sendAuthor() {
       if (this.form.name == "") {
         this.$notify({
