@@ -72,7 +72,14 @@
         "
         >Закрыть</MDBBtn
       >
-      <MDBBtn color="primary" @click="sendAuthor();fetchAuthors();">Отправить</MDBBtn>
+      <MDBBtn
+        color="primary"
+        @click="
+          sendAuthor();
+          fetchAuthors();
+        "
+        >Отправить</MDBBtn
+      >
     </MDBModalFooter>
   </MDBModal>
 
@@ -294,7 +301,7 @@ export default {
     fetchAuthors() {
       const fetchedId = this.$route.params.id;
       axios
-        .get(`${APIURL}/authors`, { params: { current: false } })
+        .get(`${APIURL}/authors`)
         .then((result) => {
           if (this.$route.params.id !== fetchedId) return;
           if (result.data.result !== undefined) {
@@ -376,6 +383,9 @@ export default {
       bodyFormData.append("age_rating", this.form.ageRating);
       bodyFormData.append("creation_type", this.form.type);
       bodyFormData.append("tags", JSON.stringify(this.checkedTags));
+      let chAuthors = this.form.choosenAuthors;
+      let authors = this.authors;
+      let roles = this.roles;
       axios
         .post(`${APIURL}/creations`, bodyFormData, {
           headers: {
@@ -384,36 +394,38 @@ export default {
         })
         .then((result) => {
           var author;
-          for (author of this.form.choosenAuthors) {
+          for (author of chAuthors) {
             var authorId = -1;
             var auth;
-            for (auth of this.authors) {
+            for (auth of authors) {
               if (auth.name == author.name) {
                 authorId = auth.id;
               }
             }
             var roleId = -1;
             var ro;
-            for (ro of this.roles) {
+            for (ro of roles) {
               if (ro.name == author.role) {
                 roleId = ro.id;
               }
             }
             axios
-              .post(
-                `${APIURL}/author-role`,
-                {
+              .post(`${APIURL}/author-role`, {
+                headers: {
+                  authorization: token,
+                },
+                body: {
                   creation_id: result.data.result.id,
                   author_id: authorId,
                   role_id: roleId,
                 },
-                {
-                  headers: {
-                    authorization: token,
-                  },
-                }
-              )
+              })
               .then(() => {
+                this.$notify({
+                  title: "Успех",
+                  text: "Произведение успешно добавлено",
+                  type: "success",
+                });
               })
               .catch((error) => {
                 this.$notify({

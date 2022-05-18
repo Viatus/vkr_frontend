@@ -258,6 +258,7 @@ export default {
             string: this.searchString,
             limit: this.selectedPageSize,
             page: this.page,
+            searchType: this.selectedSortType, 
           },
         })
         .then((result) => {

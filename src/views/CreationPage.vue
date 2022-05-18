@@ -536,15 +536,15 @@
               class="divide-y divide-gray-300 overflow-auto h-full pr-4"
             >
               <li
-                v-for="author in inv.Authors"
-                :key="author.id"
+                v-for="role in inv.Roles"
+                :key="role.id"
                 class="hover:bg-gray-100"
               >
                 <mini-author-info
-                  :author_id="author.id"
+                  :author_id="inv.id"
                   :img_height="80"
                   :img_width="80"
-                  :role="inv.name"
+                  :role="role.name"
                   :isApproved="true"
                 />
               </li>
